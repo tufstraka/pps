@@ -1,12 +1,16 @@
 package main
 
 import (
-    "database/sql"
-    "encoding/json"
+    "os"
     "log"
     "net/http"
-    "github.com/streadway/amqp"
+    "encoding/base64"
+    "bytes"
+    "database/sql"
+    "encoding/json"
+
     "github.com/gorilla/mux"
+    "github.com/streadway/amqp"
     _ "github.com/lib/pq"
 )
 
@@ -28,9 +32,12 @@ func main() {
 }
 
 type PaymentRequest struct {
-    Amount   float64 `json:"amount"`
-    Currency string  `json:"currency"`
-    Method   string  `json:"method"`
+    Amount        float64 `json:"amount"`
+    Email         string  `json:"email"`
+    Location      string  `json:"location"`
+    Username      string  `json:"username"`
+    PaymentMethod string  `json:"payment_method"`
+    Phone         string  `json:"phone"`
 }
 
 func InitiatePayment(w http.ResponseWriter, r *http.Request) {
@@ -41,8 +48,41 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
         return
     }
 
+    // Retrieve credentials from environment variables
+    username := os.Getenv("PAYD_USERNAME")
+    password := os.Getenv("PAYD_PASSWORD")
+
+    // Basic authentication credentials for Payd API
+    auth := username + ":" + password
+    authEncoded := base64.StdEncoding.EncodeToString([]byte(auth))
+
+    // Construct request body
+    jsonBody, err := json.Marshal(payment)
+    if err != nil {
+        http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+        return
+    }
+
+    // Send payment information to Payd API
+    paydAPIURL := "https://api.mypayd.app/api/v1/payments"
+    req, err := http.NewRequest("POST", paydAPIURL, bytes.NewBuffer(jsonBody))
+    if err != nil {
+        http.Error(w, "Failed to create request", http.StatusInternalServerError)
+        return
+    }
+    req.Header.Set("Content-Type", "application/json")
+    req.Header.Set("Authorization", "Basic "+authEncoded)
+
+    client := &http.Client{}
+    resp, err := client.Do(req)
+    if err != nil || resp.StatusCode != http.StatusOK {
+        http.Error(w, "Failed to initiate payment", http.StatusInternalServerError)
+        return
+    }
+    defer resp.Body.Close()
+
     // Store payment record in the database
-    _, err = db.Exec("INSERT INTO payments (amount, currency, method, status) VALUES ($1, $2, $3, $4)", payment.Amount, payment.Currency, payment.Method, "PENDING")
+    _, err = db.Exec("INSERT INTO payments (amount, currency, method, status) VALUES ($1, $2, $3, $4)", payment.Amount, "USD", payment.PaymentMethod, "PENDING")
     if err != nil {
         http.Error(w, "Internal Server Error", http.StatusInternalServerError)
         return
@@ -73,13 +113,6 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
         log.Fatal(err)
     }
 
-    // Serialize the payment struct to JSON
-    body, err := json.Marshal(payment)
-    if err != nil {
-        http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-        return
-    }
-
     err = ch.Publish(
         "",
         q.Name,
@@ -87,7 +120,7 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
         false,
         amqp.Publishing{
             ContentType: "application/json",
-            Body:        body,
+            Body:        jsonBody,
         })
     if err != nil {
         log.Fatal(err)
@@ -95,7 +128,6 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
 
     w.WriteHeader(http.StatusAccepted)
 }
-
 
 func GetPaymentStatus(w http.ResponseWriter, r *http.Request) {
     vars := mux.Vars(r)
