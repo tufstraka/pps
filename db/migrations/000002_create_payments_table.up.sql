@@ -1,10 +1,13 @@
-CREATE TABLE payments (
-    id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(id) ON DELETE CASCADE,
-    amount DECIMAL(10, 2) NOT NULL,
-    currency VARCHAR(3) NOT NULL,
-    method VARCHAR(50) NOT NULL,
-    status VARCHAR(20) DEFAULT 'PENDING',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE "payments" (
+  "id" integer PRIMARY KEY,
+  "user_id" integer,
+  "amount" decimal(10,2) NOT NULL,
+  "currency" varchar(3) NOT NULL DEFAULT 'USD',
+  "method" varchar(50) NOT NULL,
+  "status" varchar(20) DEFAULT 'PENDING',
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now())
 );
+
+ALTER TABLE "payments" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
+

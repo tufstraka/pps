@@ -1,7 +1,9 @@
-CREATE TABLE payment_logs (
-    id SERIAL PRIMARY KEY,
-    payment_id INT REFERENCES payments(id) ON DELETE CASCADE,
-    status VARCHAR(20) NOT NULL,
-    message TEXT,
-    logged_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE "payment_logs" (
+  "id" serial PRIMARY KEY,
+  "payment_id" integer,
+  "status" varchar(20) NOT NULL,
+  "message" text,
+  "logged_at" timestamp DEFAULT (now())
 );
+
+ALTER TABLE "payment_logs" ADD FOREIGN KEY ("payment_id") REFERENCES "payments" ("id");
