@@ -17,7 +17,7 @@ var db *sql.DB
 
 func main() {
     var err error
-    db, err = sql.Open("postgres", "user=postgres dbname=payment sslmode=disable")
+    db, err = sql.Open("postgres", "postgres://postgres@localhost:5432/pps?sslmode=disable")
     if err != nil {
         log.Fatal(err)
     }
@@ -33,6 +33,9 @@ func main() {
 type User struct {
     Username string `json:"username"`
     Password string `json:"password"`
+    Email string `json:"email"`
+    Location string `json:"location"`
+    Phone string `json:"phone"`
 }
 
 type Claims struct {
@@ -52,7 +55,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    _, err = db.Exec("INSERT INTO users (username, password_hash) VALUES ($1, $2)", user.Username, string(hashedPassword))
+    _, err = db.Exec("INSERT INTO users (username, password_hash, location, phone, email) VALUES ($1, $2, $3, $4, $5)", user.Username, string(hashedPassword), user.Location, user.Phone, user.Email)
     if err != nil {
         http.Error(w, "Internal Server Error", http.StatusInternalServerError)
         return
