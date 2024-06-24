@@ -8,17 +8,22 @@ import (
     "bytes"
     "database/sql"
     "encoding/json"
+    "github.com/joho/godotenv"
 
     "github.com/gorilla/mux"
-    "github.com/streadway/amqp"
+    //"github.com/streadway/amqp"
     _ "github.com/lib/pq"
 )
 
 var db *sql.DB
 
 func main() {
+    godotenv.Load()
+
     var err error
-    db, err = sql.Open("postgres", "user=postgres dbname=payment sslmode=disable")
+    postgresURI := os.Getenv("DATABASE_URL")
+
+    db, err = sql.Open("postgres", postgresURI)
     if err != nil {
         log.Fatal(err)
     }
@@ -48,22 +53,18 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Retrieve credentials from environment variables
     username := os.Getenv("PAYD_USERNAME")
     password := os.Getenv("PAYD_PASSWORD")
 
-    // Basic authentication credentials for Payd API
     auth := username + ":" + password
     authEncoded := base64.StdEncoding.EncodeToString([]byte(auth))
 
-    // Construct request body
     jsonBody, err := json.Marshal(payment)
     if err != nil {
         http.Error(w, "Internal Server Error", http.StatusInternalServerError)
         return
     }
 
-    // Send payment information to Payd API
     paydAPIURL := "https://api.mypayd.app/api/v1/payments"
     req, err := http.NewRequest("POST", paydAPIURL, bytes.NewBuffer(jsonBody))
     if err != nil {
@@ -81,15 +82,14 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
     }
     defer resp.Body.Close()
 
-    // Store payment record in the database
-    _, err = db.Exec("INSERT INTO payments (amount, currency, method, status) VALUES ($1, $2, $3, $4)", payment.Amount, "USD", payment.PaymentMethod, "PENDING")
+    _, err = db.Exec("INSERT INTO payments (amount, currency, method, status) VALUES ($1, $2, $3, $4)", payment.Amount, "KES", payment.PaymentMethod, "PENDING")
     if err != nil {
         http.Error(w, "Internal Server Error", http.StatusInternalServerError)
         return
     }
 
-    // Publish a message to the message queue
-    conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+    //TO DO: Publish a message to the message queue
+    /*conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
     if err != nil {
         log.Fatal(err)
     }
@@ -124,7 +124,7 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
         })
     if err != nil {
         log.Fatal(err)
-    }
+    }*/
 
     w.WriteHeader(http.StatusAccepted)
 }
