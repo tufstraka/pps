@@ -1,5 +1,5 @@
 CREATE TABLE "payments" (
-  "id" integer PRIMARY KEY,
+  "id" serial PRIMARY KEY,
   "user_id" integer,
   "amount" decimal(10,2) NOT NULL,
   "currency" varchar(3) NOT NULL DEFAULT 'USD',
