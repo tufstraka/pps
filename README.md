@@ -43,6 +43,7 @@ DATABASE_URL=postgres://<username>:<password>@<host>:<port>/<database>?sslmode=d
 PAYD_USERNAME=<your_payd_username>
 PAYD_PASSWORD=<your_payd_password>
 ```
+
 Replace <username>, <password>, <host>, <port>, <database>, <your_payd_username>, and <your_payd_password> with your actual database and Payd API credentials. You can get the Payd username and password from your Payd dashboard.
 
 ## Running the Services
