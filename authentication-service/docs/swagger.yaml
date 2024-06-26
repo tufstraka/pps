@@ -1,0 +1,86 @@
+basePath: /
+definitions:
+  main.User:
+    properties:
+      email:
+        type: string
+      location:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      username:
+        type: string
+    type: object
+host: localhost:8081
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is an authentication service with JWT.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Authentication Service API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate a user and return a JWT token
+      parameters:
+      - description: User Credentials
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/main.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "401":
+          description: Invalid Credentials
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Login a user
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user with the provided details
+      parameters:
+      - description: User Details
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/main.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Register a new user
+      tags:
+      - auth
+swagger: "2.0"
