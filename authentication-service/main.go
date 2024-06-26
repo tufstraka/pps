@@ -126,9 +126,10 @@ func Register(w http.ResponseWriter, r *http.Request) {
 // @Summary Login a user
 // @Description Authenticate a user and return a JWT token
 // @Tags auth
-// @Accept  json
-// @Produce  json
-// @Param user body User true "User Credentials"
+// @Accept json
+// @Produce json
+// @Param username formData string true "Username"
+// @Param password formData string true "Password"
 // @Success 200 {string} string "OK"
 // @Failure 401 {string} string "Invalid Credentials"
 // @Failure 500 {string} string "Internal Server Error"
