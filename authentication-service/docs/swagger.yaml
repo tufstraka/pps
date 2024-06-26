@@ -33,12 +33,16 @@ paths:
       - application/json
       description: Authenticate a user and return a JWT token
       parameters:
-      - description: User Credentials
-        in: body
-        name: user
+      - description: Username
+        in: formData
+        name: username
         required: true
-        schema:
-          $ref: '#/definitions/main.User'
+        type: string
+      - description: Password
+        in: formData
+        name: password
+        required: true
+        type: string
       produces:
       - application/json
       responses:
