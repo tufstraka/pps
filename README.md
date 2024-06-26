@@ -36,7 +36,7 @@ migrate -path=db/migrations -database "postgres://$PGUSER:$PGPASSWORD@$PGHOST:$P
 
 ### Step 3: Create a .env File
 
-Create a .env file at the root of the project with the following credentials:
+Create a .env file at the root of each service with the following credentials:
 
 ```sh
 DATABASE_URL=postgres://<username>:<password>@<host>:<port>/<database>?sslmode=disable
