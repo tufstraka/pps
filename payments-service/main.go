@@ -12,8 +12,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/joho/godotenv"
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
@@ -74,12 +74,10 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-    paydAPIURL := "https://api.mypayd.app/api/v1/payments"
-
+	paydAPIURL := "https://api.mypayd.app/api/v1/payments"
 
 	// Log request details
 	log.Println("Sending payment request to Payd API:")
-	log.Printf("URL: %s", paydAPIURL)
 	log.Printf("Body: %s", jsonBody)
 
 	req, err := http.NewRequest("POST", paydAPIURL, bytes.NewBuffer(jsonBody))
@@ -91,7 +89,7 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
 	req.Header.Set("Authorization", "Basic "+authEncoded)
 
 	// Make the request to external API
-	client := &http.Client{Timeout: 30 * time.Second} 
+	client := &http.Client{Timeout: 30 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Printf("Failed to send request: %v", err)
@@ -143,4 +141,3 @@ func GetPaymentStatus(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(map[string]string{"status": status})
 }
- 
