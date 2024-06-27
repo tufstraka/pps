@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"encoding/json"
-	//"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -45,13 +44,16 @@ type PaymentRequest struct {
 	Username      string  `json:"username"`
 	PaymentMethod string  `json:"payment_method"`
 	Phone         string  `json:"phone"`
+	FirstName     string  `json:"first_name"`
+	LastName      string  `json:"last_name"`
+	Reason        string  `json:"reason"`
 }
 
 func InitiatePayment(w http.ResponseWriter, r *http.Request) {
 	var payment PaymentRequest
 	err := json.NewDecoder(r.Body).Decode(&payment)
 	if err != nil {
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		http.Error(w, "Bad Request: invalid JSON structure", http.StatusBadRequest)
 		return
 	}
 
@@ -64,14 +66,14 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Prepare payment payload for payD API
+	// Prepare payment payload for Payd API
 	username := os.Getenv("PAYD_USERNAME")
 	password := os.Getenv("PAYD_PASSWORD")
 	auth := username + ":" + password
 	authEncoded := base64.StdEncoding.EncodeToString([]byte(auth))
 	jsonBody, err := json.Marshal(payment)
 	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		http.Error(w, "Internal Server Error: failed to marshal JSON", http.StatusInternalServerError)
 		return
 	}
 	paydAPIURL := "https://api.mypayd.app/api/v1/payments"
@@ -79,6 +81,7 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
 	// Log request details
 	log.Println("Sending payment request to Payd API:")
 	log.Printf("Body: %s", jsonBody)
+	log.Printf("Authorization: Basic %s", authEncoded)
 
 	req, err := http.NewRequest("POST", paydAPIURL, bytes.NewBuffer(jsonBody))
 	if err != nil {
@@ -98,20 +101,22 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		log.Printf("Failed to initiate payment. Status code: %d", resp.StatusCode)
-		http.Error(w, "Failed to initiate payment", http.StatusInternalServerError)
-		return
-	}
-
-	// Read and log the response body if available
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Error reading response body: %v", err)
 		http.Error(w, "Failed to read response body", http.StatusInternalServerError)
 		return
 	}
-	log.Printf("Payd API Response Body: %s", respBody)
+
+	// Log response status and body
+	log.Printf("Response Status Code: %d", resp.StatusCode)
+	log.Printf("Response Body: %s", respBody)
+
+	if resp.StatusCode != http.StatusOK {
+		log.Printf("Failed to initiate payment. Status code: %d", resp.StatusCode)
+		http.Error(w, "Failed to initiate payment: "+string(respBody), http.StatusBadRequest)
+		return
+	}
 
 	// Insert payment details into the payments table with user ID
 	_, err = db.Exec("INSERT INTO payments (amount, currency, method, status, user_id) VALUES ($1, $2, $3, $4, $5)",
@@ -141,3 +146,5 @@ func GetPaymentStatus(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(map[string]string{"status": status})
 }
+
+
