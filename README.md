@@ -20,6 +20,12 @@ You can quickly start working on this project by opening it in Gitpod:
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/tufstraka/pps)
 
+go to the terminal and run the following command to install the necessary dependencies
+
+```sh
+go mod tidy
+```
+
 ### Local Setup
 
 #### Step 1: Set Up PostgreSQL
