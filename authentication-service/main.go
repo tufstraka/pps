@@ -82,7 +82,6 @@ type Claims struct {
     jwt.StandardClaims
 }
 
-var jwtKey = []byte("my_secret_key")
 
 // Register godoc
 // @Summary Register a new user
@@ -127,14 +126,15 @@ func Register(w http.ResponseWriter, r *http.Request) {
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param username formData string true "Username"
-// @Param password formData string true "Password"
+// @Param user body User true "User Details"
 // @Success 200 {string} string "OK"
 // @Failure 401 {string} string "Invalid Credentials"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /auth/login [post]
 func Login(w http.ResponseWriter, r *http.Request) {
     var user User
+    my_secret_key := os.Getenv("JWT_SECRET_KEY")
+    var jwtKey = []byte(my_secret_key)
     err := json.NewDecoder(r.Body).Decode(&user)
     if err != nil {
         log.Printf("Error decoding JSON: %v", err)
