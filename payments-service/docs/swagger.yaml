@@ -1,4 +1,130 @@
+definitions:
+  main.MobilePaymentRequest:
+    properties:
+      account_id:
+        type: string
+      amount:
+        type: number
+      callback_url:
+        type: string
+      channel:
+        type: string
+      narration:
+        type: string
+      phone_number:
+        type: string
+    type: object
+  main.PaymentRequest:
+    properties:
+      amount:
+        type: number
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      location:
+        type: string
+      payment_method:
+        type: string
+      phone:
+        type: string
+      reason:
+        type: string
+      username:
+        type: string
+    type: object
 info:
   contact: {}
-paths: {}
+paths:
+  /payments/initiate:
+    post:
+      consumes:
+      - application/json
+      description: Initiate a payment to a user
+      parameters:
+      - description: Payment Request
+        in: body
+        name: payment
+        required: true
+        schema:
+          $ref: '#/definitions/main.PaymentRequest'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Initiate a payment
+      tags:
+      - payments
+  /payments/send-to-mobile:
+    post:
+      consumes:
+      - application/json
+      description: Send money to a mobile number via the Payd API
+      parameters:
+      - description: Mobile Payment Request
+        in: body
+        name: mobilePayment
+        required: true
+        schema:
+          $ref: '#/definitions/main.MobilePaymentRequest'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Send money to a mobile number
+      tags:
+      - payments
+  /payments/status/{id}:
+    get:
+      description: Get the status of a payment by ID
+      parameters:
+      - description: Payment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Payment Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get payment status
+      tags:
+      - payments
 swagger: "2.0"
