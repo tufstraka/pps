@@ -37,9 +37,47 @@ go mod tidy
 
 #### Step 1: Set Up PostgreSQL
 
-Ensure you have PostgreSQL installed and running on your local machine. Set up a username and password for accessing PostgreSQL.
+Ensure you have PostgreSQL installed and running on your local machine.
 
-#### Step 2: Create a .env File
+#### Step 2: Connect to PostgreSQL:
+
+Open a terminal or command prompt and connect to PostgreSQL using the psql command-line tool. 
+
+```sh
+psql
+```
+
+#### Create a New User:
+Once connected to the PostgreSQL shell (psql), run the following SQL command to create a new user. Replace <new_username> and <new_password> with your desired username and password:
+
+```sh
+CREATE USER <new_username> WITH PASSWORD '<new_password>';
+```
+
+#### Create test database
+Run the following command to create a database that will be used when migrating
+
+```sh
+CREATE DATABASE <new_database>
+```
+
+### Grant Permissions (Optional):
+If you want to grant specific permissions to the new user, you can do so using the GRANT command. For example, to grant all privileges on a specific database:
+
+```sh
+GRANT ALL PRIVILEGES ON DATABASE <database> TO <new_username>;
+```
+
+Replace <database_name> with the name of your database.
+
+#### Exit psql:
+Once you've created the user and granted necessary permissions, you can exit psql by typing:
+
+```sh
+\q
+```
+
+#### Step 3: Create a .env File
 
 Create a .env file at the root of each service with the following credentials:
 
@@ -51,7 +89,7 @@ PAYD_PASSWORD=<your_payd_password>
 
 Replace the variables with your actual database and Payd API credentials. You can get the Payd username and password from your Payd dashboard.
 
-#### Step 3: Migrate the Database
+#### Step 4: Migrate the Database
 
 Run the following command to migrate the database. Ensure all the necessary environment variables (`PGUSER`, `PGPASSWORD`, `PGHOST`, `PGPORT`, `PGDATABASE`, and `PGSSLMODE`) are defined based on your setup:
 
