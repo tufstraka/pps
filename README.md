@@ -20,7 +20,7 @@ You can quickly start working on this project by opening it in Gitpod:
 
 It will automatically start a postgreSQL database in the background on port 5432
 
-go to the terminal and run the following commands to set up the environment then install the necessary dependencies then skip to Step 2 under local setup
+go to the terminal and run the following commands to set up the environment then skip to Step 2 under local setup
 
 ```sh
 unset PGHOSTADDR
