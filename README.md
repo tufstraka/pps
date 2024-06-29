@@ -39,7 +39,7 @@ go mod tidy
 
 Ensure you have PostgreSQL installed and running on your local machine. Set up a username and password for accessing PostgreSQL.
 
-### Step 2: Create a .env File
+#### Step 2: Create a .env File
 
 Create a .env file at the root of each service with the following credentials:
 
