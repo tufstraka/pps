@@ -96,7 +96,7 @@ migrate -path=db/migrations -database "postgres://$PGUSER:$PGPASSWORD@$PGHOST:$P
 ```
 
 
-## Running the Services
+### Running the Services
 
 To run each service, cd into the directory and run the following command
 
@@ -104,13 +104,17 @@ To run each service, cd into the directory and run the following command
 go run .
 ```
 
-## Running the tests
+### Running the tests
 
 To run the tests, after running the service, run the following command
 
 ```sh
 go test
 ```
+### API Documentation
+To access the API documentation, go to the following endpoint for the payment and authentication services
+
+`<api_url>/swagger/`
 
 ### Database Schema
 ![Database Schema](./PPS.png)
