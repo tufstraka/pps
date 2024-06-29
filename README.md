@@ -46,7 +46,7 @@ psql
 ```
 
 #### Create a New User:
-Once connected to the PostgreSQL shell (psql), run the following SQL command to create a new user. Replace <new_username> and <new_password> with your desired username and password:
+Once connected to the PostgreSQL shell (psql), run the following SQL command to create a new user. Replace `<new_username>` and `<new_password>` with your desired username and password:
 
 ```sh
 CREATE USER <new_username> WITH PASSWORD '<new_password>';
@@ -66,7 +66,7 @@ If you want to grant specific permissions to the new user, you can do so using t
 GRANT ALL PRIVILEGES ON DATABASE <database> TO <new_username>;
 ```
 
-Replace <database_name> with the name of your database.
+Replace `<database>` with the name of your database.
 
 #### Exit psql:
 Once you've created the user and granted necessary permissions, you can exit psql by typing:
