@@ -20,9 +20,9 @@ You can quickly start working on this project by opening it in Gitpod:
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/tufstraka/pps)
 
-It will automatically start a postgreSQL database in the background on port 5432, all you have to do is set up a username and password.
+It will automatically start a postgreSQL database in the background on port 5432
 
-go to the terminal and run the following commands to set up the environment then install the necessary dependencies then skip to Step 2 under local setuo
+go to the terminal and run the following commands to set up the environment then install the necessary dependencies then skip to Step 2 under local setup
 
 ```sh
 unset PGHOSTADDR
