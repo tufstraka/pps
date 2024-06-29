@@ -2,8 +2,6 @@
 
 This project implements a payment polling service integrating with Payd APIs for handling card and mobile payments. 
 
-## Database Schema
-![Database Schema](./PPS.png)
 
 ## Getting Started
 
@@ -114,6 +112,8 @@ To run the tests, after running the service, run the following command
 go test
 ```
 
+### Database Schema
+![Database Schema](./PPS.png)
 
 
 
