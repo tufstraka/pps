@@ -16,7 +16,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// Setup the test database connection
 func TestMain(m *testing.M) {
 	var err error
 	err = godotenv.Load()
@@ -39,13 +38,11 @@ func TestMain(m *testing.M) {
 	// Clean up the test user before running tests
 	_, _ = db.Exec("DELETE FROM users WHERE username=$1", "testuser")
 
-	// Run the tests
 	code := m.Run()
 
 	// Clean up the test user after running tests
 	_, _ = db.Exec("DELETE FROM users WHERE username=$1", "testuser")
 
-	// Close the database connection
 	db.Close()
 
 	os.Exit(code)

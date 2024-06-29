@@ -16,7 +16,6 @@ import (
 
 
 func TestMain(m *testing.M) {
-    // Setup code here
     var err error
     postgresURI := os.Getenv("DATABASE_URI")
 
@@ -25,10 +24,7 @@ func TestMain(m *testing.M) {
         log.Fatal(err)
     }
 
-    // Run tests
     exitCode := m.Run()
-
-    // Teardown code here
 
     os.Exit(exitCode)
 }
@@ -64,9 +60,11 @@ func TestInitiatePayment(t *testing.T) {
     r.ServeHTTP(rr, req)
 
     if rr.Code != http.StatusAccepted {
-        t.Errorf("handler returned wrong status code: got %v want %v",
+        t.Errorf("handler returned wrong status code: got %v, expected %v",
             rr.Code, http.StatusAccepted)
-    }
+    } else {
+		log.Println("TestInitiatePayment: passed")
+	}
 }
 
 func TestSendToMobile(t *testing.T) {
@@ -89,9 +87,11 @@ func TestSendToMobile(t *testing.T) {
     r.ServeHTTP(rr, req)
 
     if rr.Code != http.StatusAccepted {
-        t.Errorf("handler returned wrong status code: got %v want %v",
+        t.Errorf("handler returned wrong status code: got %v, expected %v",
             rr.Code, http.StatusAccepted)
-    }
+    } else {
+		log.Println("TestSendToMobile: passed")
+	}
 }
 
 func TestGetPaymentStatus(t *testing.T) {
@@ -104,7 +104,9 @@ func TestGetPaymentStatus(t *testing.T) {
     r.ServeHTTP(rr, req)
 
     if rr.Code != http.StatusOK {
-        t.Errorf("handler returned wrong status code: got %v want %v",
+        t.Errorf("handler returned wrong status code: got %v, expected %v",
             rr.Code, http.StatusOK)
-    }
+    } else {
+		log.Println("TestGetPaymentStatus: passed")
+	}
 }
