@@ -1,63 +1,125 @@
 package main
 
 import (
-    "testing"
-    "net/http"
-    "net/http/httptest"
-    "strings"
-    //"github.com/stretchr/testify/assert"
+	"bytes"
+	"database/sql"
+	"encoding/json"
+	"log"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"testing"
+
+	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
+	"golang.org/x/crypto/bcrypt"
 )
 
+// Setup the test database connection
+func TestMain(m *testing.M) {
+	var err error
+	err = godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
+
+	postgresURI := os.Getenv("DATABASE_URI")
+
+	db, err = sql.Open("postgres", postgresURI)
+	if err != nil {
+		log.Fatalf("Error opening database: %v", err)
+	}
+
+	err = db.Ping()
+	if err != nil {
+		log.Fatalf("Error connecting to the database: %v db: %s", err, postgresURI)
+	}
+
+	// Clean up the test user before running tests
+	_, _ = db.Exec("DELETE FROM users WHERE username=$1", "testuser")
+
+	// Run the tests
+	code := m.Run()
+
+	// Clean up the test user after running tests
+	_, _ = db.Exec("DELETE FROM users WHERE username=$1", "testuser")
+
+	// Close the database connection
+	db.Close()
+
+	os.Exit(code)
+}
+
+func setupRouter() *mux.Router {
+	r := mux.NewRouter()
+	r.HandleFunc("/auth/register", Register).Methods("POST")
+	r.HandleFunc("/auth/login", Login).Methods("POST")
+	return r
+}
+
 func TestRegister(t *testing.T) {
-    // Prepare the request payload
-    payload := `{"username":"testuser","password":"password","email":"test@example.com","location":"Test City","phone":"1234567890"}`
-    req, err := http.NewRequest("POST", "/auth/register", strings.NewReader(payload))
-    if err != nil {
-        t.Fatal(err)
-    }
-    req.Header.Set("Content-Type", "application/json")
+	r := setupRouter()
 
-    // Create a ResponseRecorder to record the response
-    rr := httptest.NewRecorder()
+	user := User{
+		Username: "testuser",
+		Password: "password",
+		Email:    "test@example.com",
+		Location: "Test City",
+		Phone:    "1234567890",
+	}
 
-    // Call the Register handler function directly
-    Register(rr, req)
+	jsonValue, _ := json.Marshal(user)
+	req, _ := http.NewRequest("POST", "/auth/register", bytes.NewBuffer(jsonValue))
+	req.Header.Set("Content-Type", "application/json")
 
-    // Check the status code of the response
-    if rr.Code != http.StatusCreated {
-        t.Errorf("handler returned wrong status code: got %v want %v",
-            rr.Code, http.StatusCreated)
-    }
+	rr := httptest.NewRecorder()
+	r.ServeHTTP(rr, req)
 
-    // You can optionally check the response body for further validation
-    // Example:
-    // expectedBody := `User successfully registered`
-    // assert.Equal(t, expectedBody, rr.Body.String())
+	if rr.Code != http.StatusCreated {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			rr.Code, http.StatusCreated)
+	} else {
+		log.Println("TestRegister: passed")
+	}
 }
 
 func TestLogin(t *testing.T) {
-    // Prepare the request payload
-    payload := `{"username":"testuser","password":"password"}`
-    req, err := http.NewRequest("POST", "/auth/login", strings.NewReader(payload))
-    if err != nil {
-        t.Fatal(err)
-    }
-    req.Header.Set("Content-Type", "application/json")
+	r := setupRouter()
 
-    // Create a ResponseRecorder to record the response
-    rr := httptest.NewRecorder()
+	// Check if the test user already exists in the database
+	var storedHash string
+	err := db.QueryRow("SELECT password_hash FROM users WHERE username=$1", "testuser").Scan(&storedHash)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			t.Fatalf("Test user not found in the database")
+		} else {
+			t.Fatalf("Error querying database: %v", err)
+		}
+	}
 
-    // Call the Login handler function directly
-    Login(rr, req)
+	// Compare the stored hash with the expected password
+	err = bcrypt.CompareHashAndPassword([]byte(storedHash), []byte("password"))
+	if err != nil {
+		t.Fatalf("Stored password hash does not match the expected password: %v", err)
+	}
 
-    // Check the status code of the response
-    if rr.Code != http.StatusOK {
-        t.Errorf("handler returned wrong status code: got %v want %v",
-            rr.Code, http.StatusOK)
-    }
+	user := User{
+		Username: "testuser",
+		Password: "password",
+	}
 
-    // You can optionally check the response body for further validation
-    // Example:
-    // expectedBody := `{"token":"your_generated_jwt_token"}`
-    // assert.Equal(t, expectedBody, rr.Body.String())
+	jsonValue, _ := json.Marshal(user)
+	req, _ := http.NewRequest("POST", "/auth/login", bytes.NewBuffer(jsonValue))
+	req.Header.Set("Content-Type", "application/json")
+
+	rr := httptest.NewRecorder()
+	r.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			rr.Code, http.StatusOK)
+	} else {
+		log.Println("TestLogin: passed")
+	}
 }

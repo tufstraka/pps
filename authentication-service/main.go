@@ -79,6 +79,9 @@ type User struct {
 
 type Claims struct {
     Username string `json:"username"`
+    Email    string `json:"email"`
+    Location string `json:"location"`
+    Phone    string `json:"phone"`
     jwt.StandardClaims
 }
 
@@ -164,6 +167,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
     expirationTime := time.Now().Add(24 * time.Hour)
     claims := &Claims{
         Username: user.Username,
+        Email: user.Email,
+        Location: user.Location,
+        Phone: user.Phone,
         StandardClaims: jwt.StandardClaims{
             ExpiresAt: expirationTime.Unix(),
         },
