@@ -39,15 +39,7 @@ go mod tidy
 
 Ensure you have PostgreSQL installed and running on your local machine. Set up a username and password for accessing PostgreSQL.
 
-#### Step 2: Migrate the Database
-
-Run the following command to migrate the database. Ensure all the necessary environment variables (`PGUSER`, `PGPASSWORD`, `PGHOST`, `PGPORT`, `PGDATABASE`, and `PGSSLMODE`) are defined based on your setup:
-
-```sh
-migrate -path=db/migrations -database "postgres://$PGUSER:$PGPASSWORD@$PGHOST:$PGPORT/$PGDATABASE?sslmode=$PGSSLMODE" -verbose up
-```
-
-### Step 3: Create a .env File
+### Step 2: Create a .env File
 
 Create a .env file at the root of each service with the following credentials:
 
@@ -58,6 +50,15 @@ PAYD_PASSWORD=<your_payd_password>
 ```
 
 Replace the variables with your actual database and Payd API credentials. You can get the Payd username and password from your Payd dashboard.
+
+#### Step 3: Migrate the Database
+
+Run the following command to migrate the database. Ensure all the necessary environment variables (`PGUSER`, `PGPASSWORD`, `PGHOST`, `PGPORT`, `PGDATABASE`, and `PGSSLMODE`) are defined based on your setup:
+
+```sh
+migrate -path=db/migrations -database "postgres://$PGUSER:$PGPASSWORD@$PGHOST:$PGPORT/$PGDATABASE?sslmode=$PGSSLMODE" -verbose up
+```
+
 
 ## Running the Services
 
