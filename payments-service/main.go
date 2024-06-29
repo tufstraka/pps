@@ -35,6 +35,8 @@ func main() {
 	r.HandleFunc("/payments/initiate", InitiatePayment).Methods("POST")
 	r.HandleFunc("/payments/status/{id}", GetPaymentStatus).Methods("GET")
 	r.HandleFunc("/payments/send-to-mobile", SendToMobile).Methods("POST")
+	r.HandleFunc("/payments/get-card-details", GetCardDetails).Methods("POST")
+
 
 	// Swagger endpoint
 	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
@@ -257,4 +259,59 @@ func GetPaymentStatus(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(map[string]string{"status": status})
+}
+
+func GetCardDetails(w http.ResponseWriter, r *http.Request) {
+	// Prepare payment payload for Payd API
+	username := os.Getenv("PAYD_USERNAME")
+	password := os.Getenv("PAYD_PASSWORD")
+	auth := username + ":" + password
+	authEncoded := base64.StdEncoding.EncodeToString([]byte(auth))
+	paydAPIURL := "https://api.mypayd.app/api/v2/payments"
+
+	// Log request details
+	log.Println("Getting card details from Payd API:")
+	log.Printf("Authorization: Basic %s", authEncoded)
+
+	// Prepare POST request
+	req, err := http.NewRequest("POST", paydAPIURL, nil)
+	if err != nil {
+		log.Printf("Failed to create request: %v", err)
+		http.Error(w, "Failed to create request", http.StatusInternalServerError)
+		return
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Basic "+authEncoded)
+
+	// Make the request to external API
+	client := &http.Client{Timeout: 30 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Printf("Failed to send request: %v", err)
+		http.Error(w, "Failed to send request", http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+
+	// Read response body
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Printf("Error reading response body: %v", err)
+		http.Error(w, "Failed to read response body", http.StatusInternalServerError)
+		return
+	}
+
+	// Log response status and body
+	log.Printf("Response Status Code: %d", resp.StatusCode)
+	log.Printf("Response Body: %s", respBody)
+
+	// Check if request was successful
+	if resp.StatusCode != http.StatusOK {
+		log.Printf("Failed to initiate payment. Status code: %d", resp.StatusCode)
+		http.Error(w, "Failed to initiate payment: "+string(respBody), http.StatusBadRequest)
+		return
+	}
+
+	// Send response status
+	w.WriteHeader(http.StatusAccepted)
 }
