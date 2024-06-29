@@ -1,6 +1,6 @@
 # Payment Polling Service
 
-This project implements a payment polling service integrating with Payd APIs for handling card and mobile payments. The system is built using a microservices architecture with Golang, PostgreSQL, AMQP, and RPC protocols.
+This project implements a payment polling service integrating with Payd APIs for handling card and mobile payments. 
 
 ## Database Schema
 ![Database Schema](./PPS.png)
@@ -21,6 +21,10 @@ You can quickly start working on this project by opening it in Gitpod:
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/tufstraka/pps)
 
 go to the terminal and run the following command to install the necessary dependencies
+
+```sh
+unset PGHOSTADDR
+```
 
 ```sh
 go mod tidy
@@ -53,6 +57,20 @@ PAYD_PASSWORD=<your_payd_password>
 Replace the variables with your actual database and Payd API credentials. You can get the Payd username and password from your Payd dashboard.
 
 ## Running the Services
+
+To run each service, cd into the directory and run the following command
+
+```sh
+go run .
+```
+
+## Running the tests
+
+To run the tests, after running the service, run the following command
+
+```sh
+go test
+```
 
 
 
