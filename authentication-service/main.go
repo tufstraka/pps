@@ -85,7 +85,6 @@ type Claims struct {
     jwt.StandardClaims
 }
 
-
 // Register godoc
 // @Summary Register a new user
 // @Description Register a new user with the provided details
@@ -188,4 +187,5 @@ func Login(w http.ResponseWriter, r *http.Request) {
         Value:   tokenString,
         Expires: expirationTime,
     })
+
 }
