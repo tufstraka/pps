@@ -83,6 +83,7 @@ Create a .env file at the root of each service with the following credentials:
 DATABASE_URL=postgres://<username>:<password>@<host>:<port>/<database>?sslmode=disable
 PAYD_USERNAME=<your_payd_username>
 PAYD_PASSWORD=<your_payd_password>
+JWT_SECRET_KEY=<your_jwt_secret_key>
 ```
 
 Replace the variables with your actual database and Payd API credentials. You can get the Payd username and password from your Payd dashboard.

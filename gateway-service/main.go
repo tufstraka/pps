@@ -3,7 +3,6 @@ package main
 import (
 	//"bytes"
 	//"encoding/json"
-	"io"
 	"log"
 	"net/http"
 
@@ -31,7 +30,6 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	copyResponse(w, resp)
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -43,7 +41,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	copyResponse(w, resp)
 }
 
 func InitiatePayment(w http.ResponseWriter, r *http.Request) {
@@ -55,7 +52,6 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	copyResponse(w, resp)
 }
 
 func GetPaymentStatus(w http.ResponseWriter, r *http.Request) {
@@ -70,7 +66,6 @@ func GetPaymentStatus(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	copyResponse(w, resp)
 }
 
 func SendToMobile(w http.ResponseWriter, r *http.Request) {
@@ -82,13 +77,6 @@ func SendToMobile(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	copyResponse(w, resp)
 }
 
-// copyResponse copies the response from another service to the gateway service's response writer
-func copyResponse(w http.ResponseWriter, resp *http.Response) {
-	w.Header().Set("Content-Type", resp.Header.Get("Content-Type"))
-	w.WriteHeader(resp.StatusCode)
-	io.Copy(w, resp.Body)
-}
 
