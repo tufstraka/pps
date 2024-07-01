@@ -33,9 +33,9 @@ go mod tidy
 
 ### Local Setup
 
-#### Step 1: Set Up PostgreSQL
+#### Step 1: Set Up PostgreSQL and RabbitMQ
 
-Ensure you have PostgreSQL installed and running on your local machine.
+Ensure you have PostgreSQL and RabbitMQ installed and running on your local machine.
 
 #### Step 2: Connect to PostgreSQL:
 
