@@ -1,5 +1,0 @@
-#image: gitpod/workspace-postgres
-#ports:
-#  - port: 8081
-#    onOpen: ignore
-
