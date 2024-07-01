@@ -4,24 +4,15 @@ FROM golang:1.22.2 AS builder
 # Set the working directory inside the container
 WORKDIR /app
 
+COPY go.mod .
+COPY go.sum .
+
+RUN go mod tidy
+
 # Copy the rest of the application code
 COPY . .
 
-# Download all dependencies. Dependencies will be cached if the go.mod and go.sum files are not changed
-RUN go mod download
-
-# Move to the payments-service directory and build the application
-WORKDIR /app/payments-service
-RUN go build -o /app/payments-service
-
-# Use a minimal base image to run the application
-FROM gcr.io/distroless/base-debian11
-
-# Set the working directory inside the container
-WORKDIR /app
-
-# Copy the built application from the builder stage
-COPY --from=builder /app/payments-service /app/payments-service
+RUN go build -o payments-service
 
 # Copy the .env file if you need it inside the container
 COPY .env .env
