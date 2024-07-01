@@ -4,14 +4,11 @@ FROM golang:1.22.2 AS builder
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the go.mod and go.sum files from the parent directory
-COPY ../go.mod ../go.sum ./
+# Copy the rest of the application code
+COPY . .
 
 # Download all dependencies. Dependencies will be cached if the go.mod and go.sum files are not changed
 RUN go mod download
-
-# Copy the rest of the application code
-COPY . .
 
 # Move to the authentication-service directory and build the application
 WORKDIR /app/authentication-service
@@ -27,7 +24,7 @@ WORKDIR /app
 COPY --from=builder /app/authentication-service /app/authentication-service
 
 # Copy the .env file if you need it inside the container
-COPY authentication-service/.env .env
+COPY .env .env
 
 # Expose the port the service will run on
 EXPOSE 8081
