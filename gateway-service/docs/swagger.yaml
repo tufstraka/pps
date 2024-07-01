@@ -69,12 +69,16 @@ paths:
       - application/json
       description: Authenticate a user and return a JWT token
       parameters:
-      - description: User Details
-        in: body
-        name: user
+      - description: username
+        in: formData
+        name: username
         required: true
-        schema:
-          $ref: '#/definitions/main.User'
+        type: string
+      - description: password
+        in: formData
+        name: password
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -166,15 +170,13 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Accepted
           schema:
-            additionalProperties: true
-            type: object
+            type: string
         "500":
           description: Internal Server Error
           schema:
-            additionalProperties: true
-            type: object
+            type: string
       summary: Get payment status
       tags:
       - payments

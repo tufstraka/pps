@@ -135,7 +135,8 @@ func Register(w http.ResponseWriter, r *http.Request) {
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param user body User true "User Details"
+// @Param username formData string true "username"
+// @Param password formData string true "password"
 // @Success 200 {string} string "OK"
 // @Failure 401 {string} string "Invalid Credentials"
 // @Failure 500 {string} string "Internal Server Error"
@@ -212,8 +213,8 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
 // @Tags payments
 // @Produce json
 // @Param id path string true "Payment ID"
-// @Success 200 {object} map[string]interface{}
-// @Failure 500 {object} map[string]interface{}
+// @Success 200 {string} string "Accepted"
+// @Failure 500 {string} string "Internal Server Error"
 // @Router /payments/status/{id} [get]
 func GetPaymentStatus(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
