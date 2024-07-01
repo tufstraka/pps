@@ -12,19 +12,6 @@ This project implements a payment polling service integrating with Payd APIs for
 - Golang
 - Payd API credentials
 
-### Open in Gitpod
-
-You can quickly start working on this project by opening it in Gitpod:
-
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/tufstraka/pps)
-
-go to the terminal and run the following commands to set up the environment 
-
-
-```sh
-docker compose up
-```
-
 ### Local Setup (without Docker)
 
 #### Step 1: Set Up PostgreSQL and RabbitMQ
