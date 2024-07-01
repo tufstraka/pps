@@ -125,6 +125,8 @@ To access the API documentation, go to the following endpoint after running the 
 
 `<api_url>/swagger/`
 
+### Deployed endpoints
+
 ### Database Schema
 ![Database Schema](./PPS.png)
 
