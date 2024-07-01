@@ -31,7 +31,7 @@ go mod tidy
 ```
 
 
-### Local Setup
+### Local Setup (without Docker)
 
 #### Step 1: Set Up PostgreSQL and RabbitMQ
 
@@ -112,6 +112,14 @@ To run the tests, after running the service, run the following command
 ```sh
 go test
 ```
+
+### Local Setup (with Docker)
+Run 
+
+```sh
+sudo docker compose up
+```
+
 ### API Documentation
 To access the API documentation, go to the following endpoint after running the services
 
