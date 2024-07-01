@@ -77,6 +77,11 @@ type User struct {
     Phone    string `json:"phone"`
 }
 
+type UserLogin struct {
+    Username string `json:"username"`
+    Password string `json:"password"`
+}
+
 type PaymentRequest struct {
 	Amount        float64 `json:"amount"`
 	Email         string  `json:"email"`
@@ -135,8 +140,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param username formData string true "username"
-// @Param password formData string true "password"
+// @Param user body UserLogin true "User details"
 // @Success 200 {string} string "OK"
 // @Failure 401 {string} string "Invalid Credentials"
 // @Failure 500 {string} string "Internal Server Error"

@@ -51,6 +51,13 @@ definitions:
       username:
         type: string
     type: object
+  main.UserLogin:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -69,16 +76,12 @@ paths:
       - application/json
       description: Authenticate a user and return a JWT token
       parameters:
-      - description: username
-        in: formData
-        name: username
+      - description: User details
+        in: body
+        name: user
         required: true
-        type: string
-      - description: password
-        in: formData
-        name: password
-        required: true
-        type: string
+        schema:
+          $ref: '#/definitions/main.UserLogin'
       produces:
       - application/json
       responses:
