@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  postgres:
+    image: "postgres:13"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+
+  gateway-service:
+    build:
+      context: ./gateway-service
+      dockerfile: Dockerfile
+    depends_on:
+      - rabbitmq
+      - postgres
+    environment:
+      RABBITMQ_URL: ${RABBITMQ_URL}
+      DATABASE_URL: ${DATABASE_URI}
+      PAYD_USERNAME: ${PAYD_USERNAME}
+      PAYD_PASSWORD: ${PAYD_PASSWORD}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+
+    ports:
+      - "8080:8080"
+
+  auth-service:
+    build:
+      context: ./authentication-service
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    environment:
+      RABBITMQ_URL: ${RABBITMQ_URL}
+      DATABASE_URL: ${DATABASE_URI}
+      PAYD_USERNAME: ${PAYD_USERNAME}
+      PAYD_PASSWORD: ${PAYD_PASSWORD}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY} 
+    ports:
+      - "8081:8081"
+
+  payments-service:
+    build:
+      context: ./payments-service
+      dockerfile: Dockerfile
+    depends_on:
+      - rabbitmq
+      - postgres
+    environment:
+      RABBITMQ_URL: ${RABBITMQ_URL}
+      DATABASE_URL: ${DATABASE_URI}
+      PAYD_USERNAME: ${PAYD_USERNAME}
+      PAYD_PASSWORD: ${PAYD_PASSWORD}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+    ports:
+      - "8082:8082"
