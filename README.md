@@ -113,7 +113,7 @@ To run the tests, after running the service, run the following command
 go test
 ```
 ### API Documentation
-To access the API documentation, go to the following endpoint for the payment and authentication services
+To access the API documentation, go to the following endpoint after running the services
 
 `<api_url>/swagger/`
 
