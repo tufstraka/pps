@@ -10,11 +10,26 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/streadway/amqp"
+	"github.com/swaggo/http-swagger" 
+	_ "github.com/tufstraka/pps/gateway-service/docs" 
 )
 
 var amqpChannel *amqp.Channel
 var queueName = "payment_status_queue"
-var retryDelay = 30 * time.Second // Retry delay duration
+var retryDelay = 30 * time.Second 
+
+// @title Payment Gateway API
+// @version 1.0
+// @description This is a a payment gateway.
+
+// @contact.name API Support
+// @contact.email keithkadima@gmail.com
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host localhost:8080
+// @BasePath /
 
 func main() {
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
@@ -47,12 +62,23 @@ func main() {
 	r.HandleFunc("/payments/initiate", InitiatePayment).Methods("POST")
 	r.HandleFunc("/payments/status/{id}", GetPaymentStatus).Methods("GET")
 	r.HandleFunc("/payments/send-to-mobile", SendToMobile).Methods("POST")
+	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
 	log.Println("Gateway service started on :8080")
 	go PollPayments()
 	http.ListenAndServe(":8080", r)
 }
 
+// Register godoc
+// @Summary Register a new user
+// @Description Register a new user in the system
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param request body map[string]interface{} true "Register request"
+// @Success 200 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /register [post]
 func Register(w http.ResponseWriter, r *http.Request) {
 	resp, err := http.Post("http://localhost:8081/auth/register", "application/json", r.Body)
 	if err != nil {
@@ -72,6 +98,16 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	w.Write(body)
 }
 
+// Login godoc
+// @Summary Log in a user
+// @Description Log in a user and return a token
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param request body map[string]interface{} true "Login request"
+// @Success 200 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /login [post]
 func Login(w http.ResponseWriter, r *http.Request) {
 	resp, err := http.Post("http://localhost:8081/auth/login", "application/json", r.Body)
 	if err != nil {
@@ -91,6 +127,16 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	w.Write(body)
 }
 
+// InitiatePayment godoc
+// @Summary Initiate a new payment
+// @Description Initiate a new payment transaction
+// @Tags payments
+// @Accept json
+// @Produce json
+// @Param request body map[string]interface{} true "Payment request"
+// @Success 200 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /payments/initiate [post]
 func InitiatePayment(w http.ResponseWriter, r *http.Request) {
 	resp, err := http.Post("http://localhost:8082/payments/initiate", "application/json", r.Body)
 	if err != nil {
@@ -109,13 +155,21 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(resp.StatusCode)
 	w.Write(body)
 
-	// Check if payment failed and add to retry queue if necessary
 	if resp.StatusCode != http.StatusOK {
 		log.Println("Card payment failed, adding to retry queue")
 		AddToRetryQueue("card-payment", body)
 	}
 }
 
+// GetPaymentStatus godoc
+// @Summary Get payment status
+// @Description Get the status of a payment by ID
+// @Tags payments
+// @Produce json
+// @Param id path string true "Payment ID"
+// @Success 200 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /payments/status/{id} [get]
 func GetPaymentStatus(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -138,6 +192,16 @@ func GetPaymentStatus(w http.ResponseWriter, r *http.Request) {
 	w.Write(body)
 }
 
+// SendToMobile godoc
+// @Summary Send money to mobile
+// @Description Send money to a mobile number
+// @Tags payments
+// @Accept json
+// @Produce json
+// @Param request body map[string]interface{} true "Send to mobile request"
+// @Success 200 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /payments/send-to-mobile [post]
 func SendToMobile(w http.ResponseWriter, r *http.Request) {
 	resp, err := http.Post("http://localhost:8082/payments/send-to-mobile", "application/json", r.Body)
 	if err != nil {
@@ -180,6 +244,13 @@ func AddToRetryQueue(paymentType string, body []byte) {
 	}
 }
 
+// PollPayments godoc
+// @Summary Poll payments from RabbitMQ queue
+// @Description Polls the RabbitMQ queue for payment messages and processes them
+// @Tags payments
+// @Success 200 {string} string "OK"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /poll-payments [get]
 func PollPayments() {
 	for {
 		msgs, err := amqpChannel.Consume(
@@ -208,6 +279,7 @@ func PollPayments() {
 	}
 }
 
+// getPaymentType determines the payment type from message body
 func getPaymentType(body []byte) string {
 	//payment type is included in the message body as a JSON field
 	var message map[string]interface{}
@@ -218,8 +290,9 @@ func getPaymentType(body []byte) string {
 	return message["paymentType"].(string)
 }
 
+// RetrySendToMobile retries sending money to mobile
 func RetrySendToMobile(body []byte) {
-	time.Sleep(retryDelay) 
+	time.Sleep(retryDelay)
 	resp, err := http.Post("http://localhost:8082/payments/send-to-mobile", "application/json", io.NopCloser(bytes.NewBuffer(body)))
 	if err != nil {
 		log.Printf("Failed to retry send money to mobile: %v", err)
@@ -235,8 +308,9 @@ func RetrySendToMobile(body []byte) {
 	}
 }
 
+// RetryCardPayment retries initiating card payment
 func RetryCardPayment(body []byte) {
-	time.Sleep(retryDelay) 
+	time.Sleep(retryDelay)
 	resp, err := http.Post("http://localhost:8082/payments/initiate", "application/json", io.NopCloser(bytes.NewBuffer(body)))
 	if err != nil {
 		log.Printf("Failed to retry card payment: %v", err)
@@ -251,3 +325,4 @@ func RetryCardPayment(body []byte) {
 		log.Printf("Retry succeeded")
 	}
 }
+
