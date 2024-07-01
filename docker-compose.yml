@@ -31,7 +31,7 @@ services:
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
 
     ports:
-      - "8080:8080"
+      - "8083:8083"
 
   auth-service:
     build:
@@ -46,7 +46,7 @@ services:
       PAYD_PASSWORD: ${PAYD_PASSWORD}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY} 
     ports:
-      - "8081:8081"
+      - "8085:8085"
 
   payments-service:
     build:

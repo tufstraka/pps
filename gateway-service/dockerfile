@@ -18,7 +18,7 @@ RUN go build -o gateway-service
 COPY .env .env
 
 # Expose the port the service will run on
-EXPOSE 8082
+EXPOSE 8083
 
 # Command to run the executable
 CMD ["./gateway-service"]
