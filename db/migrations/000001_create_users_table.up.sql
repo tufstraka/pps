@@ -4,6 +4,6 @@ CREATE TABLE "users" (
   "password_hash" varchar(255) UNIQUE NOT NULL,
   "location" varchar,
   "phone" varchar(15) NOT NULL,
-  "email" varchar(20) UNIQUE NOT NULL,
+  "email" varchar(55) UNIQUE NOT NULL,
   "created_at" timestamp DEFAULT (now())
 );
