@@ -184,7 +184,6 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Make the POST request to initiate payment
 	resp, err := http.Post("http://localhost:8082/payments/initiate", "application/json", bytes.NewReader(bodyBytes))
 	if err != nil {
 		log.Printf("Failed to initiate payment: %v", err)
@@ -193,7 +192,6 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	// Read the response body
 	responseBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Failed to read response body: %v", err)
@@ -203,7 +201,6 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(resp.StatusCode)
 	w.Write(responseBody)
 
-	// Add the original request body to the retry queue if the response status code is not OK
 	if resp.StatusCode != http.StatusOK {
 		log.Println("Card payment failed, adding to retry queue")
 		AddToRetryQueue("card-payment", bodyBytes)
@@ -254,7 +251,6 @@ func GetPaymentStatus(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /payments/send-to-mobile [post]
 func SendToMobile(w http.ResponseWriter, r *http.Request) {
-	// Read and store the request body
 	bodyBytes, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Printf("Failed to read request body: %v", err)
@@ -262,7 +258,6 @@ func SendToMobile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Make the POST request to send money to mobile
 	resp, err := http.Post("http://localhost:8082/payments/send-to-mobile", "application/json", bytes.NewReader(bodyBytes))
 	if err != nil {
 		log.Printf("Failed to send money to mobile: %v", err)
@@ -271,7 +266,6 @@ func SendToMobile(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	// Read the response body
 	responseBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Failed to read response body: %v", err)
@@ -281,7 +275,6 @@ func SendToMobile(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(resp.StatusCode)
 	w.Write(responseBody)
 
-	// Add the original request body to the retry queue if the response status code is not OK
 	if resp.StatusCode != http.StatusOK {
 		log.Println("Mobile payment failed, adding to retry queue")
 		AddToRetryQueue("send-to-mobile", bodyBytes)
@@ -336,7 +329,6 @@ func PollPayments() {
 	}
 }
 
-// getPaymentType determines the payment type from message body
 func getPaymentType(body []byte) string {
 	var message map[string]interface{}
 	if err := json.Unmarshal(body, &message); err != nil {
@@ -344,7 +336,6 @@ func getPaymentType(body []byte) string {
 		return ""
 	}
 
-	// Check if 'paymentType' exists and is a string
 	paymentType, ok := message["payment_method"].(string)
 	if !ok {
 		log.Println("paymentType not found or is not a string")
@@ -354,7 +345,6 @@ func getPaymentType(body []byte) string {
 	return paymentType
 }
 
-// RetryCardPayment retries initiating card payment with a limit of 5 attempts
 func RetryCardPayment(body []byte) {
 	attempts := 0
 	for attempts < 5 {
@@ -382,7 +372,6 @@ func RetryCardPayment(body []byte) {
 }
 
 
-// RetrySendToMobile retries sending money to mobile with a limit of 5 attempts
 func RetrySendToMobile(body []byte) {
 	attempts := 0
 	for attempts < 5 {

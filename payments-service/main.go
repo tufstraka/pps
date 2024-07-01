@@ -37,14 +37,12 @@ func main() {
 	r.HandleFunc("/payments/send-to-mobile", SendToMobile).Methods("POST")
 	r.HandleFunc("/payments/get-card-details", GetCardDetails).Methods("POST")
 
-	// Swagger endpoint
 	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
 	log.Println("Payments service started on :8082")
 	http.ListenAndServe(":8082", r)
 }
 
-// PaymentRequest represents the payload for initiating a payment
 type PaymentRequest struct {
 	Amount        float64 `json:"amount"`
 	Email         string  `json:"email"`
@@ -57,7 +55,6 @@ type PaymentRequest struct {
 	Reason        string  `json:"reason"`
 }
 
-// MobilePaymentRequest represents the payload for sending money to mobile
 type MobilePaymentRequest struct {
 	AccountID     string  `json:"account_id"`
 	PhoneNumber   string  `json:"phone_number"`
@@ -87,7 +84,6 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Retrieve user ID based on username
 	var id int
 	err = db.QueryRow("SELECT id FROM users WHERE username=$1", payment.Username).Scan(&id)
 	if err != nil {
@@ -96,7 +92,6 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Prepare payment payload for Payd API
 	username := os.Getenv("PAYD_USERNAME")
 	password := os.Getenv("PAYD_PASSWORD")
 	auth := username + ":" + password
@@ -108,7 +103,6 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
 	}
 	paydAPIURL := "https://api.mypayd.app/api/v1/payments"
 
-	// Log request details
 	log.Println("Sending payment request to Payd API:")
 	log.Printf("Body: %s", jsonBody)
 	log.Printf("Authorization: Basic %s", authEncoded)
@@ -121,7 +115,6 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Basic "+authEncoded)
 
-	// Make the request to external API
 	client := &http.Client{Timeout: 30 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -138,7 +131,6 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Log response status and body
 	log.Printf("Response Status Code: %d", resp.StatusCode)
 	log.Printf("Response Body: %s", respBody)
 
@@ -148,7 +140,6 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Insert payment details into the payments table with user ID
 	_, err = db.Exec("INSERT INTO payments (amount, currency, method, status, user_id) VALUES ($1, $2, $3, $4, $5)",
 		payment.Amount, "KES", payment.PaymentMethod, "PENDING", id)
 	if err != nil {
@@ -178,7 +169,6 @@ func SendToMobile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Prepare payment payload for Payd API
 	username := os.Getenv("PAYD_USERNAME")
 	password := os.Getenv("PAYD_PASSWORD")
 	auth := username + ":" + password
@@ -190,7 +180,6 @@ func SendToMobile(w http.ResponseWriter, r *http.Request) {
 	}
 	paydAPIURL := "https://api.mypayd.app/api/v2/withdrawal"
 
-	// Log request details
 	log.Println("Sending mobile payment request to Payd API:")
 	log.Printf("Body: %s", jsonBody)
 	log.Printf("Authorization: Basic %s", authEncoded)
@@ -203,7 +192,6 @@ func SendToMobile(w http.ResponseWriter, r *http.Request) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Basic "+authEncoded)
 
-	// Make the request to external API
 	client := &http.Client{Timeout: 30 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -220,7 +208,6 @@ func SendToMobile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Log response status and body
 	log.Printf("Response Status Code: %d", resp.StatusCode)
 	log.Printf("Response Body: %s", respBody)
 
@@ -262,18 +249,15 @@ func GetPaymentStatus(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetCardDetails(w http.ResponseWriter, r *http.Request) {
-	// Prepare payment payload for Payd API
 	username := os.Getenv("PAYD_USERNAME")
 	password := os.Getenv("PAYD_PASSWORD")
 	auth := username + ":" + password
 	authEncoded := base64.StdEncoding.EncodeToString([]byte(auth))
 	paydAPIURL := "https://api.mypayd.app/api/v2/payments"
 
-	// Log request details
 	log.Println("Getting card details from Payd API:")
 	log.Printf("Authorization: Basic %s", authEncoded)
 
-	// Prepare POST request
 	req, err := http.NewRequest("POST", paydAPIURL, nil)
 	if err != nil {
 		log.Printf("Failed to create request: %v", err)
@@ -283,7 +267,6 @@ func GetCardDetails(w http.ResponseWriter, r *http.Request) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Basic "+authEncoded)
 
-	// Make the request to external API
 	client := &http.Client{Timeout: 30 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -293,7 +276,6 @@ func GetCardDetails(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	// Read response body
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Error reading response body: %v", err)
@@ -301,17 +283,14 @@ func GetCardDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Log response status and body
 	log.Printf("Response Status Code: %d", resp.StatusCode)
 	log.Printf("Response Body: %s", respBody)
 
-	// Check if request was successful
 	if resp.StatusCode != http.StatusOK {
 		log.Printf("Failed to initiate payment. Status code: %d", resp.StatusCode)
 		http.Error(w, "Failed to initiate payment: "+string(respBody), http.StatusBadRequest)
 		return
 	}
 
-	// Send response status
 	w.WriteHeader(http.StatusAccepted)
 }

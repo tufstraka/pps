@@ -59,7 +59,6 @@ func main() {
     r.HandleFunc("/auth/register", Register).Methods("POST")
     r.HandleFunc("/auth/login", Login).Methods("POST")
 
-    // Swagger endpoint
     r.PathPrefix("/swagger").Handler(httpSwagger.WrapHandler)
 
     log.Println("Authentication service started on :8081")
