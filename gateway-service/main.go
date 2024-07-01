@@ -69,15 +69,46 @@ func main() {
 	http.ListenAndServe(":8080", r)
 }
 
+type User struct {
+    Username string `json:"username"`
+    Password string `json:"password"`
+    Email    string `json:"email"`
+    Location string `json:"location"`
+    Phone    string `json:"phone"`
+}
+
+type PaymentRequest struct {
+	Amount        float64 `json:"amount"`
+	Email         string  `json:"email"`
+	Location      string  `json:"location"`
+	Username      string  `json:"username"`
+	PaymentMethod string  `json:"payment_method"`
+	Phone         string  `json:"phone"`
+	FirstName     string  `json:"first_name"`
+	LastName      string  `json:"last_name"`
+	Reason        string  `json:"reason"`
+}
+
+type MobilePaymentRequest struct {
+	AccountID     string  `json:"account_id"`
+	PhoneNumber   string  `json:"phone_number"`
+	Amount        float64 `json:"amount"`
+	Narration     string  `json:"narration"`
+	CallbackURL   string  `json:"callback_url"`
+	Channel       string  `json:"channel"`
+	PaymentMethod string  `json:"payment_method"`
+}
+
+
 // Register godoc
 // @Summary Register a new user
-// @Description Register a new user in the system
+// @Description Register a new user with the provided details
 // @Tags auth
-// @Accept json
-// @Produce json
-// @Param request body map[string]interface{} true "Register request"
-// @Success 200 {object} map[string]interface{}
-// @Failure 500 {object} map[string]interface{}
+// @Accept  json
+// @Produce  json
+// @Param user body User true "User Details"
+// @Success 201 {string} string "Created"
+// @Failure 500 {string} string "Internal Server Error"
 // @Router /register [post]
 func Register(w http.ResponseWriter, r *http.Request) {
 	resp, err := http.Post("http://localhost:8081/auth/register", "application/json", r.Body)
@@ -99,14 +130,15 @@ func Register(w http.ResponseWriter, r *http.Request) {
 }
 
 // Login godoc
-// @Summary Log in a user
-// @Description Log in a user and return a token
+// @Summary Login a user
+// @Description Authenticate a user and return a JWT token
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param request body map[string]interface{} true "Login request"
-// @Success 200 {object} map[string]interface{}
-// @Failure 500 {object} map[string]interface{}
+// @Param user body User true "User Details"
+// @Success 200 {string} string "OK"
+// @Failure 401 {string} string "Invalid Credentials"
+// @Failure 500 {string} string "Internal Server Error"
 // @Router /login [post]
 func Login(w http.ResponseWriter, r *http.Request) {
 	resp, err := http.Post("http://localhost:8081/auth/login", "application/json", r.Body)
@@ -128,14 +160,15 @@ func Login(w http.ResponseWriter, r *http.Request) {
 }
 
 // InitiatePayment godoc
-// @Summary Initiate a new payment
-// @Description Initiate a new payment transaction
+// @Summary Initiate a payment
+// @Description Initiate a payment for a user
 // @Tags payments
 // @Accept json
 // @Produce json
-// @Param request body map[string]interface{} true "Payment request"
-// @Success 200 {object} map[string]interface{}
-// @Failure 500 {object} map[string]interface{}
+// @Param payment body PaymentRequest true "Payment Request"
+// @Success 202 {string} string "Accepted"
+// @Failure 400 {string} string "Bad Request"
+// @Failure 500 {string} string "Internal Server Error"
 // @Router /payments/initiate [post]
 func InitiatePayment(w http.ResponseWriter, r *http.Request) {
 	// Read and store the request body
@@ -205,14 +238,15 @@ func GetPaymentStatus(w http.ResponseWriter, r *http.Request) {
 }
 
 // SendToMobile godoc
-// @Summary Send money to mobile
-// @Description Send money to a mobile number
+// @Summary Send money to a mobile number
+// @Description Send money to a mobile number via the Payd API
 // @Tags payments
 // @Accept json
 // @Produce json
-// @Param request body map[string]interface{} true "Send to mobile request"
-// @Success 200 {object} map[string]interface{}
-// @Failure 500 {object} map[string]interface{}
+// @Param mobilePayment body MobilePaymentRequest true "Mobile Payment Request"
+// @Success 202 {string} string "Accepted"
+// @Failure 400 {string} string "Bad Request"
+// @Failure 500 {string} string "Internal Server Error"
 // @Router /payments/send-to-mobile [post]
 func SendToMobile(w http.ResponseWriter, r *http.Request) {
 	// Read and store the request body
@@ -268,13 +302,7 @@ func AddToRetryQueue(paymentType string, body []byte) {
 	}
 }
 
-// PollPayments godoc
-// @Summary Poll payments from RabbitMQ queue
-// @Description Polls the RabbitMQ queue for payment messages and processes them
-// @Tags payments
-// @Success 200 {string} string "OK"
-// @Failure 500 {string} string "Internal Server Error"
-// @Router /poll-payments [get]
+
 func PollPayments() {
 	for {
 		msgs, err := amqpChannel.Consume(

@@ -9,11 +9,9 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "termsOfService": "http://swagger.io/terms/",
         "contact": {
             "name": "API Support",
-            "url": "http://www.swagger.io/support",
-            "email": "support@swagger.io"
+            "email": "keithkadima@gmail.com"
         },
         "license": {
             "name": "Apache 2.0",
@@ -26,7 +24,7 @@ const docTemplate = `{
     "paths": {
         "/login": {
             "post": {
-                "description": "Log in a user and return a token",
+                "description": "Authenticate a user and return a JWT token",
                 "consumes": [
                     "application/json"
                 ],
@@ -36,16 +34,15 @@ const docTemplate = `{
                 "tags": [
                     "auth"
                 ],
-                "summary": "Log in a user",
+                "summary": "Login a user",
                 "parameters": [
                     {
-                        "description": "Login request",
-                        "name": "request",
+                        "description": "User Details",
+                        "name": "user",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/main.User"
                         }
                     }
                 ],
@@ -53,15 +50,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid Credentials",
+                        "schema": {
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "type": "string"
                         }
                     }
                 }
@@ -69,7 +70,7 @@ const docTemplate = `{
         },
         "/payments/initiate": {
             "post": {
-                "description": "Initiate a new payment transaction",
+                "description": "Initiate a payment for a user",
                 "consumes": [
                     "application/json"
                 ],
@@ -79,32 +80,35 @@ const docTemplate = `{
                 "tags": [
                     "payments"
                 ],
-                "summary": "Initiate a new payment",
+                "summary": "Initiate a payment",
                 "parameters": [
                     {
-                        "description": "Payment request",
-                        "name": "request",
+                        "description": "Payment Request",
+                        "name": "payment",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/main.PaymentRequest"
                         }
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "202": {
+                        "description": "Accepted",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "type": "string"
                         }
                     }
                 }
@@ -112,7 +116,7 @@ const docTemplate = `{
         },
         "/payments/send-to-mobile": {
             "post": {
-                "description": "Send money to a mobile number",
+                "description": "Send money to a mobile number via the Payd API",
                 "consumes": [
                     "application/json"
                 ],
@@ -122,32 +126,35 @@ const docTemplate = `{
                 "tags": [
                     "payments"
                 ],
-                "summary": "Send money to mobile",
+                "summary": "Send money to a mobile number",
                 "parameters": [
                     {
-                        "description": "Send to mobile request",
-                        "name": "request",
+                        "description": "Mobile Payment Request",
+                        "name": "mobilePayment",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/main.MobilePaymentRequest"
                         }
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "202": {
+                        "description": "Accepted",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "type": "string"
                         }
                     }
                 }
@@ -190,32 +197,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/poll-payments": {
-            "get": {
-                "description": "Polls the RabbitMQ queue for payment messages and processes them",
-                "tags": [
-                    "payments"
-                ],
-                "summary": "Poll payments from RabbitMQ queue",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
         "/register": {
             "post": {
-                "description": "Register a new user in the system",
+                "description": "Register a new user with the provided details",
                 "consumes": [
                     "application/json"
                 ],
@@ -228,31 +212,108 @@ const docTemplate = `{
                 "summary": "Register a new user",
                 "parameters": [
                     {
-                        "description": "Register request",
-                        "name": "request",
+                        "description": "User Details",
+                        "name": "user",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/main.User"
                         }
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "type": "string"
                         }
                     }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "main.MobilePaymentRequest": {
+            "type": "object",
+            "properties": {
+                "account_id": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "number"
+                },
+                "callback_url": {
+                    "type": "string"
+                },
+                "channel": {
+                    "type": "string"
+                },
+                "narration": {
+                    "type": "string"
+                },
+                "payment_method": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.PaymentRequest": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "payment_method": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "reason": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.User": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         }
@@ -266,7 +327,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Payment Gateway API",
-	Description:      "This is a sample server for a payment gateway.",
+	Description:      "This is a a payment gateway.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

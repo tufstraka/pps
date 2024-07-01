@@ -1,15 +1,65 @@
 basePath: /
+definitions:
+  main.MobilePaymentRequest:
+    properties:
+      account_id:
+        type: string
+      amount:
+        type: number
+      callback_url:
+        type: string
+      channel:
+        type: string
+      narration:
+        type: string
+      payment_method:
+        type: string
+      phone_number:
+        type: string
+    type: object
+  main.PaymentRequest:
+    properties:
+      amount:
+        type: number
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      location:
+        type: string
+      payment_method:
+        type: string
+      phone:
+        type: string
+      reason:
+        type: string
+      username:
+        type: string
+    type: object
+  main.User:
+    properties:
+      email:
+        type: string
+      location:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      username:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact:
-    email: support@swagger.io
+    email: keithkadima@gmail.com
     name: API Support
-    url: http://www.swagger.io/support
-  description: This is a sample server for a payment gateway.
+  description: This is a a payment gateway.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  termsOfService: http://swagger.io/terms/
   title: Payment Gateway API
   version: "1.0"
 paths:
@@ -17,87 +67,90 @@ paths:
     post:
       consumes:
       - application/json
-      description: Log in a user and return a token
+      description: Authenticate a user and return a JWT token
       parameters:
-      - description: Login request
+      - description: User Details
         in: body
-        name: request
+        name: user
         required: true
         schema:
-          additionalProperties: true
-          type: object
+          $ref: '#/definitions/main.User'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            additionalProperties: true
-            type: object
+            type: string
+        "401":
+          description: Invalid Credentials
+          schema:
+            type: string
         "500":
           description: Internal Server Error
           schema:
-            additionalProperties: true
-            type: object
-      summary: Log in a user
+            type: string
+      summary: Login a user
       tags:
       - auth
   /payments/initiate:
     post:
       consumes:
       - application/json
-      description: Initiate a new payment transaction
+      description: Initiate a payment for a user
       parameters:
-      - description: Payment request
+      - description: Payment Request
         in: body
-        name: request
+        name: payment
         required: true
         schema:
-          additionalProperties: true
-          type: object
+          $ref: '#/definitions/main.PaymentRequest'
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "202":
+          description: Accepted
           schema:
-            additionalProperties: true
-            type: object
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
         "500":
           description: Internal Server Error
           schema:
-            additionalProperties: true
-            type: object
-      summary: Initiate a new payment
+            type: string
+      summary: Initiate a payment
       tags:
       - payments
   /payments/send-to-mobile:
     post:
       consumes:
       - application/json
-      description: Send money to a mobile number
+      description: Send money to a mobile number via the Payd API
       parameters:
-      - description: Send to mobile request
+      - description: Mobile Payment Request
         in: body
-        name: request
+        name: mobilePayment
         required: true
         schema:
-          additionalProperties: true
-          type: object
+          $ref: '#/definitions/main.MobilePaymentRequest'
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "202":
+          description: Accepted
           schema:
-            additionalProperties: true
-            type: object
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
         "500":
           description: Internal Server Error
           schema:
-            additionalProperties: true
-            type: object
-      summary: Send money to mobile
+            type: string
+      summary: Send money to a mobile number
       tags:
       - payments
   /payments/status/{id}:
@@ -125,47 +178,29 @@ paths:
       summary: Get payment status
       tags:
       - payments
-  /poll-payments:
-    get:
-      description: Polls the RabbitMQ queue for payment messages and processes them
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            type: string
-      summary: Poll payments from RabbitMQ queue
-      tags:
-      - payments
   /register:
     post:
       consumes:
       - application/json
-      description: Register a new user in the system
+      description: Register a new user with the provided details
       parameters:
-      - description: Register request
+      - description: User Details
         in: body
-        name: request
+        name: user
         required: true
         schema:
-          additionalProperties: true
-          type: object
+          $ref: '#/definitions/main.User'
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
-            additionalProperties: true
-            type: object
+            type: string
         "500":
           description: Internal Server Error
           schema:
-            additionalProperties: true
-            type: object
+            type: string
       summary: Register a new user
       tags:
       - auth
