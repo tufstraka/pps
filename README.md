@@ -58,13 +58,17 @@ Once you've created the user and granted necessary permissions, you can exit psq
 
 #### Step 3: Create a .env File
 
-Create a .env file at the root of each service with the following credentials:
+Create a .env file at the root of the repo and each service with the following credentials:
 
 ```sh
 DATABASE_URL=postgres://<username>:<password>@<host>:<port>/<database>?sslmode=disable
 PAYD_USERNAME=<your_payd_username>
 PAYD_PASSWORD=<your_payd_password>
 JWT_SECRET_KEY=<your_jwt_secret_key>
+POSTGRES_USER=<postgres_username>
+POSTGRES_PASSWORD=<postgres_password>
+POSTGRES_DB=<postgres_db_name>
+RABBITMQ_URL=<rabbit_mq_url> eg amqp://guest:guest@localhost:5672/
 ```
 
 Replace the variables with your actual database and Payd API credentials. You can get the Payd username and password from your Payd dashboard.
@@ -95,6 +99,21 @@ go test
 ```
 
 ### Local Setup (with Docker)
+
+Create a .env file at the root of the repo and each service with the following credentials:
+
+```sh
+DATABASE_URL=postgres://<username>:<password>@<host>:<port>/<database>?sslmode=disable
+PAYD_USERNAME=<your_payd_username>
+PAYD_PASSWORD=<your_payd_password>
+JWT_SECRET_KEY=<your_jwt_secret_key>
+POSTGRES_USER=<postgres_username>
+POSTGRES_PASSWORD=<postgres_password>
+POSTGRES_DB=<postgres_db_name>
+RABBITMQ_URL=<rabbit_mq_url> eg amqp://guest:guest@localhost:5672/
+```
+
+
 Run 
 
 ```sh
