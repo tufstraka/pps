@@ -11,6 +11,8 @@ definitions:
         type: string
       narration:
         type: string
+      payment_method:
+        type: string
       phone_number:
         type: string
     type: object

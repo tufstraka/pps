@@ -37,7 +37,6 @@ func main() {
 	r.HandleFunc("/payments/send-to-mobile", SendToMobile).Methods("POST")
 	r.HandleFunc("/payments/get-card-details", GetCardDetails).Methods("POST")
 
-
 	// Swagger endpoint
 	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
@@ -60,12 +59,13 @@ type PaymentRequest struct {
 
 // MobilePaymentRequest represents the payload for sending money to mobile
 type MobilePaymentRequest struct {
-	AccountID    string  `json:"account_id"`
-	PhoneNumber  string  `json:"phone_number"`
-	Amount       float64 `json:"amount"`
-	Narration    string  `json:"narration"`
-	CallbackURL  string  `json:"callback_url"`
-	Channel      string  `json:"channel"`
+	AccountID     string  `json:"account_id"`
+	PhoneNumber   string  `json:"phone_number"`
+	Amount        float64 `json:"amount"`
+	Narration     string  `json:"narration"`
+	CallbackURL   string  `json:"callback_url"`
+	Channel       string  `json:"channel"`
+	PaymentMethod string  `json:"payment_method"`
 }
 
 // InitiatePayment godoc

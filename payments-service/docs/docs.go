@@ -171,6 +171,9 @@ const docTemplate = `{
                 "narration": {
                     "type": "string"
                 },
+                "payment_method": {
+                    "type": "string"
+                },
                 "phone_number": {
                     "type": "string"
                 }
