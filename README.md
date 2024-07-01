@@ -35,7 +35,7 @@ go mod tidy
 
 #### Step 1: Set Up PostgreSQL and RabbitMQ
 
-Ensure you have PostgreSQL and RabbitMQ installed and running on your local machine.
+Ensure you have PostgreSQL and [RabbitMQ](https://www.rabbitmq.com/docs/install-debian) installed and running on your local machine.
 
 #### Step 2: Connect to PostgreSQL:
 
