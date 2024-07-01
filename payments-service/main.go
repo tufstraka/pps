@@ -144,7 +144,7 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
 
 	if resp.StatusCode != http.StatusOK {
 		log.Printf("Failed to initiate payment. Status code: %d", resp.StatusCode)
-		http.Error(w, "Failed to initiate payment: "+string(respBody), http.StatusBadRequest)
+		http.Error(w, string(respBody), http.StatusBadRequest)
 		return
 	}
 
