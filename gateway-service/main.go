@@ -64,9 +64,9 @@ func main() {
 	r.HandleFunc("/payments/send-to-mobile", SendToMobile).Methods("POST")
 	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
-	log.Println("Gateway service started on :8080")
+	log.Println("Gateway service started on :8083")
 	go PollPayments()
-	http.ListenAndServe(":8080", r)
+	http.ListenAndServe(":8083", r)
 }
 
 type User struct {

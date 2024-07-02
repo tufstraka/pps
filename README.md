@@ -126,6 +126,9 @@ To access the API documentation, go to the following endpoint after running the 
 
 ### Deployed endpoints
 
+[Payments](http://54.145.134.156:8082/swagger/index.html)
+[Authentication]
+
 ### Database Schema
 ![Database Schema](./PPS.png)
 

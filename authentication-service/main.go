@@ -61,8 +61,8 @@ func main() {
 
     r.PathPrefix("/swagger").Handler(httpSwagger.WrapHandler)
 
-    log.Println("Authentication service started on :8081")
-    err = http.ListenAndServe(":8081", r)
+    log.Println("Authentication service started on :8085")
+    err = http.ListenAndServe(":8085", r)
     if err != nil {
         log.Fatalf("Error starting server: %v", err)
     }
