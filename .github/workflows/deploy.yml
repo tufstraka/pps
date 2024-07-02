@@ -30,6 +30,6 @@ jobs:
         EC2_HOST: ${{ secrets.EC2_HOST }}
       run: |
         ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
-          cd /payd-demo  # Adjust this path to your repository on the EC2 instance
-          sudo git pull origin main  # Adjust this as per your branch
+          cd ./payd-demo  
+          sudo git pull origin main 
         EOF
