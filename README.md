@@ -7,10 +7,9 @@ This project implements a payment polling service integrating with Payd APIs for
 
 ### Prerequisites
 
-- [Gitpod](https://gitpod.io/)
+- RabbitMQ
 - PostgreSQL
 - Golang
-- Payd API credentials
 
 ### Local Setup (without Docker)
 
