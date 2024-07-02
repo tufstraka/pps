@@ -66,15 +66,12 @@ services:
   migration-service:
       image: migrate/migrate:v4.15.0
       environment:
-        POSTGRES_USER: ${POSTGRES_USER}
-        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-        POSTGRES_DB: ${POSTGRES_DB}
-      command: [
-        "sh", "-c", "migrate -path /migrations -database postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable up"
-      ]
+        DATABASE_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable
+      command: ["-path", "/migrations", "-database", "postgres://${DATABASE_URI}", "up"]
       volumes:
         - ./db/migrations:/migrations
       depends_on:
         - postgres
-      ports:
-        - "8084:8084"
+      env_file:
+        - .env  
+
