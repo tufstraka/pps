@@ -24,7 +24,6 @@ services:
       - rabbitmq
       - postgres
     environment:
-      RABBITMQ_URL: ${RABBITMQ_URL}
       DATABASE_URL: ${DATABASE_URI}
       PAYD_USERNAME: ${PAYD_USERNAME}
       PAYD_PASSWORD: ${PAYD_PASSWORD}
@@ -39,7 +38,6 @@ services:
     depends_on:
       - postgres
     environment:
-      RABBITMQ_URL: ${RABBITMQ_URL}
       DATABASE_URL: ${DATABASE_URI}
       PAYD_USERNAME: ${PAYD_USERNAME}
       PAYD_PASSWORD: ${PAYD_PASSWORD}
@@ -55,7 +53,6 @@ services:
       - rabbitmq
       - postgres
     environment:
-      RABBITMQ_URL: ${RABBITMQ_URL}
       DATABASE_URL: ${DATABASE_URI}
       PAYD_USERNAME: ${PAYD_USERNAME}
       PAYD_PASSWORD: ${PAYD_PASSWORD}
