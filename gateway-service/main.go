@@ -78,7 +78,6 @@ func loggingMiddleware(next http.Handler) http.Handler {
 		start := time.Now()
 
 		log.Printf("Started %s %s from %s", r.Method, r.RequestURI, r.RemoteAddr)
-		log.Printf("Headers: %+v", r.Header)
 
 		if r.Method == "POST" {
 			body, err := io.ReadAll(r.Body)
