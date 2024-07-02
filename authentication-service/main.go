@@ -21,7 +21,7 @@ import (
 )
 
 // @title Authentication Service API
-// @version 1.0
+// @version 0.1
 // @description This is an authentication service with JWT.
 // @termsOfService http://swagger.io/terms/
 
@@ -31,7 +31,7 @@ import (
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host localhost:8081
+// @host localhost:8085
 // @BasePath /
 
 var db *sql.DB

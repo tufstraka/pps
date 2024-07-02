@@ -20,6 +20,19 @@ import (
 
 var db *sql.DB
 
+// @title Payment APIs
+// @version 0.1
+// @description This is a payment service with Payd API integration.
+
+// @contact.name API Support
+// @contact.email keithkadima@gmail.com
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host localhost:8082
+// @BasePath /
+
 func main() {
 	godotenv.Load()
 

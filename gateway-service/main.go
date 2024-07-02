@@ -19,7 +19,7 @@ var queueName = "payment_status_queue"
 var retryDelay = 30 * time.Second
 
 // @title Payment Gateway API
-// @version 1.0
+// @version 0.1
 // @description This is a a payment gateway.
 
 // @contact.name API Support
@@ -28,7 +28,7 @@ var retryDelay = 30 * time.Second
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host localhost:8080
+// @host localhost:8083
 // @BasePath /
 
 func main() {
