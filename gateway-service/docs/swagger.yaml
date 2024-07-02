@@ -63,7 +63,8 @@ info:
   contact:
     email: keithkadima@gmail.com
     name: API Support
-  description: This is a a payment gateway.
+  description: This is a payment gateway service that integrates with the authentication
+    and payments services.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html

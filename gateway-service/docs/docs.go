@@ -336,7 +336,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Payment Gateway API",
-	Description:      "This is a a payment gateway.",
+	Description:      "This is a payment gateway service that integrates with the authentication and payments services.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

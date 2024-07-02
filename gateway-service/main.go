@@ -20,8 +20,7 @@ var retryDelay = 30 * time.Second
 
 // @title Payment Gateway API
 // @version 0.1
-// @description This is a a payment gateway.
-
+// @description This is a payment gateway service that integrates with the authentication and payments services.
 // @contact.name API Support
 // @contact.email keithkadima@gmail.com
 

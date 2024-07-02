@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "This is a a payment gateway.",
+        "description": "This is a payment gateway service that integrates with the authentication and payments services.",
         "title": "Payment Gateway API",
         "contact": {
             "name": "API Support",
