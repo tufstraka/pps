@@ -195,8 +195,6 @@ func SendToMobile(w http.ResponseWriter, r *http.Request) {
 	paydAPIURL := "https://api.mypayd.app/api/v2/withdrawal"
 
 	log.Println("Sending mobile payment request to Payd API:")
-	log.Printf("Body: %s", jsonBody)
-	log.Printf("Authorization: Basic %s", authEncoded)
 
 	req, err := http.NewRequest("POST", paydAPIURL, bytes.NewBuffer(jsonBody))
 	if err != nil {

@@ -228,7 +228,7 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(resp.StatusCode)
 	w.Write(responseBody)
 
-	if resp.StatusCode != http.StatusOK {
+	if resp.StatusCode != http.StatusCreated {
 		log.Println("Card payment failed, adding to retry queue")
 		AddToRetryQueue("card-payment", bodyBytes)
 	}
