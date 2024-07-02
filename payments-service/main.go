@@ -161,6 +161,7 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusAccepted)
+	w.Write(respBody)
 }
 
 // SendToMobile godoc
