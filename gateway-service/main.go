@@ -116,7 +116,7 @@ type MobilePaymentRequest struct {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /register [post]
 func Register(w http.ResponseWriter, r *http.Request) {
-	resp, err := http.Post("http://localhost:8081/auth/register", "application/json", r.Body)
+	resp, err := http.Post("http://localhost:8085/auth/register", "application/json", r.Body)
 	if err != nil {
 		log.Printf("Failed to register user: %v", err)
 		http.Error(w, "Failed to register user", http.StatusInternalServerError)
@@ -146,7 +146,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /login [post]
 func Login(w http.ResponseWriter, r *http.Request) {
-	resp, err := http.Post("http://localhost:8081/auth/login", "application/json", r.Body)
+	resp, err := http.Post("http://localhost:8085/auth/login", "application/json", r.Body)
 	if err != nil {
 		log.Printf("Failed to login user: %v", err)
 		http.Error(w, "Failed to login user", http.StatusInternalServerError)
