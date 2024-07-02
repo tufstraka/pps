@@ -67,7 +67,7 @@ services:
     image: migrate/migrate:v4.15.0
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable
-    command: ["-path", "/db/migrations", "-database", "postgres://${DATABASE_URL}", "up"]
+    command: ["-path", "/migrations", "-database", "postgres://${DATABASE_URL}", "up"]
     volumes:
       - ./db/migrations:/migrations
     depends_on:
