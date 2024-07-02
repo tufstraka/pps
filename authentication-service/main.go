@@ -7,6 +7,7 @@ import (
     "net/http"
     "os"
     "time"
+    "fmt"
 
     "github.com/joho/godotenv"
 
@@ -191,5 +192,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
         Value:   tokenString,
         Expires: expirationTime,
     })
+
+    w.WriteHeader(http.StatusOK)
+    fmt.Fprintf(w, "Login successful")
+
 
 }
