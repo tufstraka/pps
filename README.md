@@ -121,11 +121,7 @@ sudo docker compose up
 
 ### Deployed endpoints
 
-[Payments](http://54.145.134.156:8082/swagger/index.html)
-
 [Gateway](http://54.145.134.156:8083/swagger/index.html)
-
-[Authentication](http://54.145.134.156:8085/swagger/index.html)
 
 ### Database Schema
 ![Database Schema](./PPS.png)
