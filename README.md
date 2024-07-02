@@ -119,15 +119,13 @@ Run
 sudo docker compose up
 ```
 
-### API Documentation
-To access the API documentation, go to the following endpoint after running the services
-
-`<api_url>/swagger/`
-
 ### Deployed endpoints
 
 [Payments](http://54.145.134.156:8082/swagger/index.html)
-[Authentication]()
+
+[Gateway](http://54.145.134.156:8083/swagger/index.html)
+
+[Authentication](http://54.145.134.156:8085/swagger/index.html)
 
 ### Database Schema
 ![Database Schema](./PPS.png)
