@@ -1,3 +1,4 @@
+basePath: /
 definitions:
   main.MobilePaymentRequest:
     properties:
@@ -37,8 +38,17 @@ definitions:
       username:
         type: string
     type: object
+host: localhost:8082
 info:
-  contact: {}
+  contact:
+    email: keithkadima@gmail.com
+    name: API Support
+  description: This is a payment service with Payd API integration.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Payment APIs
+  version: "0.1"
 paths:
   /payments/initiate:
     post:
