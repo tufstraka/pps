@@ -116,7 +116,7 @@ type MobilePaymentRequest struct {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /register [post]
 func Register(w http.ResponseWriter, r *http.Request) {
-	resp, err := http.Post("http://localhost:8085/auth/register", "application/json", r.Body)
+	resp, err := http.Post("http://54.145.134.156:8085/auth/register", "application/json", r.Body)
 	if err != nil {
 		log.Printf("Failed to register user: %v", err)
 		http.Error(w, "Failed to register user", http.StatusInternalServerError)
@@ -146,7 +146,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /login [post]
 func Login(w http.ResponseWriter, r *http.Request) {
-	resp, err := http.Post("http://localhost:8085/auth/login", "application/json", r.Body)
+	resp, err := http.Post("http://54.145.134.156:8085/auth/login", "application/json", r.Body)
 	if err != nil {
 		log.Printf("Failed to login user: %v", err)
 		http.Error(w, "Failed to login user", http.StatusInternalServerError)
@@ -184,7 +184,7 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp, err := http.Post("http://localhost:8082/payments/initiate", "application/json", bytes.NewReader(bodyBytes))
+	resp, err := http.Post("http://54.145.134.156:8082/payments/initiate", "application/json", bytes.NewReader(bodyBytes))
 	if err != nil {
 		log.Printf("Failed to initiate payment: %v", err)
 		http.Error(w, "Failed to initiate payment", http.StatusInternalServerError)
@@ -221,7 +221,7 @@ func GetPaymentStatus(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	resp, err := http.Get("http://localhost:8082/payments/status/" + id)
+	resp, err := http.Get("http://54.145.134.156:8082/payments/status/" + id)
 	if err != nil {
 		log.Printf("Failed to get payment status: %v", err)
 		http.Error(w, "Failed to get payment status", http.StatusInternalServerError)
@@ -258,7 +258,7 @@ func SendToMobile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp, err := http.Post("http://localhost:8082/payments/send-to-mobile", "application/json", bytes.NewReader(bodyBytes))
+	resp, err := http.Post("http://54.145.134.156:8082/payments/send-to-mobile", "application/json", bytes.NewReader(bodyBytes))
 	if err != nil {
 		log.Printf("Failed to send money to mobile: %v", err)
 		http.Error(w, "Failed to send money to mobile", http.StatusInternalServerError)
@@ -349,7 +349,7 @@ func RetryCardPayment(body []byte) {
 	attempts := 0
 	for attempts < 5 {
 		time.Sleep(retryDelay)
-		resp, err := http.Post("http://localhost:8082/payments/initiate", "application/json", io.NopCloser(bytes.NewBuffer(body)))
+		resp, err := http.Post("http://54.145.134.156:8082/payments/initiate", "application/json", io.NopCloser(bytes.NewBuffer(body)))
 		if err != nil {
 			log.Printf("Failed to retry card payment: %v", err)
 			attempts++
@@ -376,7 +376,7 @@ func RetrySendToMobile(body []byte) {
 	attempts := 0
 	for attempts < 5 {
 		time.Sleep(retryDelay)
-		resp, err := http.Post("http://localhost:8082/payments/send-to-mobile", "application/json", io.NopCloser(bytes.NewBuffer(body)))
+		resp, err := http.Post("http://54.145.134.156:8082/payments/send-to-mobile", "application/json", io.NopCloser(bytes.NewBuffer(body)))
 		if err != nil {
 			log.Printf("Failed to retry send money to mobile: %v", err)
 			attempts++
