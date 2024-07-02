@@ -13,19 +13,25 @@ definitions:
       username:
         type: string
     type: object
-host: localhost:8081
+  main.UserLogin:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+host: localhost:8085
 info:
   contact:
-    email: support@swagger.io
+    email: keithkadima@gmail.com
     name: API Support
-    url: http://www.swagger.io/support
   description: This is an authentication service with JWT.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
   title: Authentication Service API
-  version: "1.0"
+  version: "0.1"
 paths:
   /auth/login:
     post:
@@ -33,16 +39,12 @@ paths:
       - application/json
       description: Authenticate a user and return a JWT token
       parameters:
-      - description: Username
-        in: formData
-        name: username
+      - description: User Details
+        in: body
+        name: user
         required: true
-        type: string
-      - description: Password
-        in: formData
-        name: password
-        required: true
-        type: string
+        schema:
+          $ref: '#/definitions/main.UserLogin'
       produces:
       - application/json
       responses:

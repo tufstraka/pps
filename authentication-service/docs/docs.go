@@ -12,8 +12,7 @@ const docTemplate = `{
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
             "name": "API Support",
-            "url": "http://www.swagger.io/support",
-            "email": "support@swagger.io"
+            "email": "keithkadima@gmail.com"
         },
         "license": {
             "name": "Apache 2.0",
@@ -39,18 +38,13 @@ const docTemplate = `{
                 "summary": "Login a user",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Username",
-                        "name": "username",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Password",
-                        "name": "password",
-                        "in": "formData",
-                        "required": true
+                        "description": "User Details",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.UserLogin"
+                        }
                     }
                 ],
                 "responses": {
@@ -136,14 +130,25 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "main.UserLogin": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
         }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.0",
-	Host:             "localhost:8081",
+	Version:          "0.1",
+	Host:             "localhost:8085",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Authentication Service API",
