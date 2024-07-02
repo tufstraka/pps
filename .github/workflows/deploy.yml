@@ -31,5 +31,6 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
           cd ./payd-demo  
-          sudo git pull origin main 
+          sudo git pull origin main
+          sudo docker-compose up -d --build
         EOF
