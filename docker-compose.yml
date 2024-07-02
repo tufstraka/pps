@@ -29,7 +29,6 @@ services:
       PAYD_USERNAME: ${PAYD_USERNAME}
       PAYD_PASSWORD: ${PAYD_PASSWORD}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
-
     ports:
       - "8083:8083"
 
@@ -44,7 +43,7 @@ services:
       DATABASE_URL: ${DATABASE_URI}
       PAYD_USERNAME: ${PAYD_USERNAME}
       PAYD_PASSWORD: ${PAYD_PASSWORD}
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY} 
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
     ports:
       - "8085:8085"
 
@@ -63,3 +62,14 @@ services:
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
     ports:
       - "8082:8082"
+
+  migration-service:
+    image: migrate/migrate:v4.15.0
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable
+    command: ["-path", "/db/migrations", "-database", "postgres://${DATABASE_URL}", "up"]
+    volumes:
+      - ./db/migrations:/migrations
+    depends_on:
+      - postgres
+
