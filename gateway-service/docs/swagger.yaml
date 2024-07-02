@@ -58,7 +58,7 @@ definitions:
       username:
         type: string
     type: object
-host: localhost:8080
+host: 54.145.134.156:8083
 info:
   contact:
     email: keithkadima@gmail.com
@@ -68,7 +68,7 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   title: Payment Gateway API
-  version: "1.0"
+  version: "0.1"
 paths:
   /login:
     post:
