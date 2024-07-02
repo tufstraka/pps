@@ -57,6 +57,9 @@ func main() {
 	}
 
 	r := mux.NewRouter()
+
+	r.Use(loggingMiddleware)
+
 	r.HandleFunc("/register", Register).Methods("POST")
 	r.HandleFunc("/login", Login).Methods("POST")
 	r.HandleFunc("/payments/initiate", InitiatePayment).Methods("POST")
@@ -67,6 +70,31 @@ func main() {
 	log.Println("Gateway service started on :8083")
 	go PollPayments()
 	http.ListenAndServe(":8083", r)
+}
+
+// Middleware function to log request details
+func loggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+
+		log.Printf("Started %s %s from %s", r.Method, r.RequestURI, r.RemoteAddr)
+		log.Printf("Headers: %+v", r.Header)
+
+		if r.Method == "POST" {
+			body, err := io.ReadAll(r.Body)
+			if err != nil {
+				log.Printf("Failed to read request body: %v", err)
+			} else {
+				log.Printf("Body: %s", body)
+				r.Body = io.NopCloser(bytes.NewBuffer(body)) // Reset the request body
+			}
+		}
+
+		next.ServeHTTP(w, r)
+
+		duration := time.Since(start)
+		log.Printf("Completed %s %s in %v", r.Method, r.RequestURI, duration)
+	})
 }
 
 type User struct {
