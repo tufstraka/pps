@@ -7,7 +7,6 @@ import (
     "net/http"
     "os"
     "time"
-    "fmt"
 
     "github.com/joho/godotenv"
 
@@ -90,6 +89,12 @@ type Claims struct {
     jwt.StandardClaims
 }
 
+type LoginResponse struct {
+    Status string `json:"status"`
+    Token  string `json:"token"`
+}
+
+
 // Register godoc
 // @Summary Register a new user
 // @Description Register a new user with the provided details
@@ -134,14 +139,14 @@ func Register(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Produce json
 // @Param user body UserLogin true "User Details"
-// @Success 200 {string} string "OK"
-// @Failure 401 {string} string "Invalid Credentials"
-// @Failure 500 {string} string "Internal Server Error"
+// @Success 200 {object} LoginResponse "Login successful"
+// @Failure 401 {object} map[string]string{"status": "invalid credentials"}
+// @Failure 500 {object} map[string]string{"status": "server error"}
 // @Router /auth/login [post]
 func Login(w http.ResponseWriter, r *http.Request) {
-    var user User
-    my_secret_key := os.Getenv("JWT_SECRET_KEY")
-    var jwtKey = []byte(my_secret_key)
+    var user UserLogin
+    mySecretKey := os.Getenv("JWT_SECRET_KEY")
+    var jwtKey = []byte(mySecretKey)
     err := json.NewDecoder(r.Body).Decode(&user)
     if err != nil {
         log.Printf("Error decoding JSON: %v", err)
@@ -153,27 +158,24 @@ func Login(w http.ResponseWriter, r *http.Request) {
     err = db.QueryRow("SELECT password_hash FROM users WHERE username=$1", user.Username).Scan(&storedHash)
     if err != nil {
         if err == sql.ErrNoRows {
-            http.Error(w, "Invalid Credentials", http.StatusUnauthorized)
+            http.Error(w, `{"status": "invalid credentials"}`, http.StatusUnauthorized)
             return
         }
         log.Printf("Error querying database: %v", err)
-        http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+        http.Error(w, `{"status": "server error"}`, http.StatusInternalServerError)
         return
     }
 
     err = bcrypt.CompareHashAndPassword([]byte(storedHash), []byte(user.Password))
     if err != nil {
         log.Printf("Error comparing password hash: %v", err)
-        http.Error(w, "Invalid Credentials", http.StatusUnauthorized)
+        http.Error(w, `{"status": "invalid credentials"}`, http.StatusUnauthorized)
         return
     }
 
     expirationTime := time.Now().Add(24 * time.Hour)
     claims := &Claims{
         Username: user.Username,
-        Email: user.Email,
-        Location: user.Location,
-        Phone: user.Phone,
         StandardClaims: jwt.StandardClaims{
             ExpiresAt: expirationTime.Unix(),
         },
@@ -183,18 +185,16 @@ func Login(w http.ResponseWriter, r *http.Request) {
     tokenString, err := token.SignedString(jwtKey)
     if err != nil {
         log.Printf("Error signing token: %v", err)
-        http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+        http.Error(w, `{"status": "server error"}`, http.StatusInternalServerError)
         return
     }
 
-    http.SetCookie(w, &http.Cookie{
-        Name:    "token",
-        Value:   tokenString,
-        Expires: expirationTime,
-    })
+    response := LoginResponse{
+        Status: "Login successful",
+        Token:  tokenString,
+    }
 
+    w.Header().Set("Content-Type", "application/json")
     w.WriteHeader(http.StatusOK)
-    fmt.Fprintf(w, "Login successful")
-
-
+    json.NewEncoder(w).Encode(response)
 }

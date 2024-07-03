@@ -16,4 +16,3 @@ COPY .env .env
 EXPOSE 8082
 
 CMD ["./payments-service"]
-
