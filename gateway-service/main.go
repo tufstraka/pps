@@ -95,6 +95,7 @@ func loggingMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+//@ignore
 type User struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
@@ -103,11 +104,13 @@ type User struct {
 	Phone    string `json:"phone"`
 }
 
+//@ignore
 type UserLogin struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
+//@ignore
 type PaymentRequest struct {
 	Amount        float64 `json:"amount"`
 	Email         string  `json:"email"`
@@ -120,6 +123,7 @@ type PaymentRequest struct {
 	Reason        string  `json:"reason"`
 }
 
+//@ignore
 type MobilePaymentRequest struct {
 	AccountID     string  `json:"account_id"`
 	PhoneNumber   string  `json:"phone_number"`
@@ -130,15 +134,18 @@ type MobilePaymentRequest struct {
 	PaymentMethod string  `json:"payment_method"`
 }
 
+//@ignore
 type LoginSuccessResponse struct {
 	Status string `json:"status"`
 	Token  string `json:"token"`
 }
 
+//@ignore
 type SuccessResponse struct {
 	User User `json:"user"`
 }
 
+//@ignore
 type FailResponse struct {
 	Status string `json:"status"`
 }
