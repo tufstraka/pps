@@ -54,7 +54,7 @@ const docTemplate = `{
                         }
                     },
                     "401": {
-                        "description": "Login failed",
+                        "description": "Invalid credentials",
                         "schema": {
                             "$ref": "#/definitions/main.FailResponse"
                         }
@@ -259,9 +259,6 @@ const docTemplate = `{
                 },
                 "token": {
                     "type": "string"
-                },
-                "user": {
-                    "$ref": "#/definitions/main.User"
                 }
             }
         },
@@ -326,7 +323,7 @@ const docTemplate = `{
         "main.SuccessResponse": {
             "type": "object",
             "properties": {
-                "status": {
+                "user": {
                     "type": "string"
                 }
             }

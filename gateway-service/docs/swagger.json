@@ -48,7 +48,7 @@
                         }
                     },
                     "401": {
-                        "description": "Login failed",
+                        "description": "Invalid credentials",
                         "schema": {
                             "$ref": "#/definitions/main.FailResponse"
                         }
@@ -253,9 +253,6 @@
                 },
                 "token": {
                     "type": "string"
-                },
-                "user": {
-                    "$ref": "#/definitions/main.User"
                 }
             }
         },
@@ -320,7 +317,7 @@
         "main.SuccessResponse": {
             "type": "object",
             "properties": {
-                "status": {
+                "user": {
                     "type": "string"
                 }
             }

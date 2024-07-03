@@ -11,8 +11,6 @@ definitions:
         type: string
       token:
         type: string
-      user:
-        $ref: '#/definitions/main.User'
     type: object
   main.MobilePaymentRequest:
     properties:
@@ -54,7 +52,7 @@ definitions:
     type: object
   main.SuccessResponse:
     properties:
-      status:
+      user:
         type: string
     type: object
   main.User:
@@ -110,7 +108,7 @@ paths:
           schema:
             $ref: '#/definitions/main.LoginSuccessResponse'
         "401":
-          description: Login failed
+          description: Invalid credentials
           schema:
             $ref: '#/definitions/main.FailResponse'
         "500":
