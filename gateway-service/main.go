@@ -96,16 +96,16 @@ func loggingMiddleware(next http.Handler) http.Handler {
 }
 
 type User struct {
-    Username string `json:"username"`
-    Password string `json:"password"`
-    Email    string `json:"email"`
-    Location string `json:"location"`
-    Phone    string `json:"phone"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
+	Location string `json:"location"`
+	Phone    string `json:"phone"`
 }
 
 type UserLogin struct {
-    Username string `json:"username"`
-    Password string `json:"password"`
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 type PaymentRequest struct {
@@ -130,7 +130,6 @@ type MobilePaymentRequest struct {
 	PaymentMethod string  `json:"payment_method"`
 }
 
-
 // Register godoc
 // @Summary Register a new user
 // @Description Register a new user with the provided details
@@ -138,9 +137,9 @@ type MobilePaymentRequest struct {
 // @Accept  json
 // @Produce  json
 // @Param user body User true "User Details"
-// @Success 201 {string} string "Created"
-// @Failure 500 {string} string "Internal Server Error"
-// @Router /register [post]
+// @Success 201 {object} map[string]interface{} "Registration successful with user details"
+// @Failure 401 {object} map[string]string{"status": "invalid credentials"}
+// @Failure 500 {object} map[string]string{"status": "server error"}// @Router /register [post]
 func Register(w http.ResponseWriter, r *http.Request) {
 	resp, err := http.Post("http://54.145.134.156:8085/auth/register", "application/json", r.Body)
 	if err != nil {
@@ -156,8 +155,18 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to read response", http.StatusInternalServerError)
 		return
 	}
-	w.WriteHeader(resp.StatusCode)
-	w.Write(body)
+
+	w.Header().Set("Content-Type", "application/json")
+	if resp.StatusCode == http.StatusOK {
+		w.WriteHeader(http.StatusOK)
+		w.Write(body) 
+	} else if resp.StatusCode == http.StatusUnauthorized {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte(`{"status": "invalid credentials"}`))
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"status": "server error"}`))
+	}
 }
 
 // Login godoc
@@ -167,15 +176,15 @@ func Register(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Produce json
 // @Param user body UserLogin true "User details"
-// @Success 200 {string} string "OK"
-// @Failure 401 {string} string "Invalid Credentials"
-// @Failure 500 {string} string "Internal Server Error"
+// @Success 200 {object} map[string]interface{} "Login successful with user details"
+// @Failure 401 {object} map[string]string{"status": "invalid credentials"}
+// @Failure 500 {object} map[string]string{"status": "server error"}
 // @Router /login [post]
 func Login(w http.ResponseWriter, r *http.Request) {
 	resp, err := http.Post("http://54.145.134.156:8085/auth/login", "application/json", r.Body)
 	if err != nil {
 		log.Printf("Failed to login user: %v", err)
-		http.Error(w, "Failed to login user", http.StatusInternalServerError)
+		http.Error(w, `{"status": "server error"}`, http.StatusInternalServerError)
 		return
 	}
 	defer resp.Body.Close()
@@ -183,11 +192,21 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Failed to read response: %v", err)
-		http.Error(w, "Failed to read response", http.StatusInternalServerError)
+		http.Error(w, `{"status": "server error"}`, http.StatusInternalServerError)
 		return
 	}
-	w.WriteHeader(resp.StatusCode)
-	w.Write(body)
+	
+	w.Header().Set("Content-Type", "application/json")
+	if resp.StatusCode == http.StatusOK {
+		w.WriteHeader(http.StatusOK)
+		w.Write(body) 
+	} else if resp.StatusCode == http.StatusUnauthorized {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte(`{"status": "invalid credentials"}`))
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"status": "server error"}`))
+	}
 }
 
 // InitiatePayment godoc
@@ -197,7 +216,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Produce json
 // @Param payment body PaymentRequest true "Payment Request"
-// @Success 202 {string} string "Accepted"
+// @Success 202 {object} map[string]string{"status_code":"","merchant_reference":"b4d2bec4-13cc-4967-b857-dd0a54753d51","transaction_type":"","success":true,"message":"Payment request sent successfully","status":200,"checkout_request_id":"b4d2bec4-13cc-4967-b857-dd0a54753d51","checkout_url":"https://pay.pesapal.com/iframe/PesapalIframe3/Index?OrderTrackingId=b4d2bec4-13cc-4967-b857-dd0a54753d51","transaction_reference":"b4d2bec4-13cc-4967-b857-dd0a54753d51","channel":"card","payment_gateway":"paystack"}
 // @Failure 400 {string} string "Bad Request"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /payments/initiate [post]
@@ -232,7 +251,6 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
 		AddToRetryQueue("card-payment", bodyBytes)
 	}
 }
-
 
 // GetPaymentStatus godoc
 // @Summary Get payment status
@@ -307,7 +325,6 @@ func SendToMobile(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 func AddToRetryQueue(paymentType string, body []byte) {
 	msg := amqp.Publishing{
 		ContentType: "application/json",
@@ -325,7 +342,6 @@ func AddToRetryQueue(paymentType string, body []byte) {
 		log.Printf("Failed to publish message: %v", err)
 	}
 }
-
 
 func PollPayments() {
 	for {
@@ -396,7 +412,6 @@ func RetryCardPayment(body []byte) {
 	log.Printf("Retry attempts exhausted for initiating card payment")
 	AddToRetryQueue("card-payment", body)
 }
-
 
 func RetrySendToMobile(body []byte) {
 	attempts := 0
