@@ -130,21 +130,36 @@ type MobilePaymentRequest struct {
 	PaymentMethod string  `json:"payment_method"`
 }
 
+type LoginSuccessResponse struct {
+	Status string `json:"status"`
+	Token  string `json:"token"`
+	User   User   `json:"user"`
+}
+
+type SuccessResponse struct {
+	Status string `json:"status"`
+}
+
+type FailResponse struct {
+	Status string `json:"status"`
+}
+
 // Register godoc
 // @Summary Register a new user
 // @Description Register a new user with the provided details
 // @Tags auth
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Param user body User true "User Details"
-// @Success 201 {object} map[string]interface{} "Registration successful with user details"
-// @Failure 401 {object} map[string]string{"status": "invalid credentials"}
-// @Failure 500 {object} map[string]string{"status": "server error"}// @Router /register [post]
+// @Success 201 {object} SuccessResponse "Registration successful"
+// @Failure 401 {object} FailResponse "Registration failed"
+// @Failure 500 {object} FailResponse "Server error"
+// @Router /register [post]
 func Register(w http.ResponseWriter, r *http.Request) {
 	resp, err := http.Post("http://54.145.134.156:8085/auth/register", "application/json", r.Body)
 	if err != nil {
 		log.Printf("Failed to register user: %v", err)
-		http.Error(w, "Failed to register user", http.StatusInternalServerError)
+		http.Error(w, `{"status": "server error"}`, http.StatusInternalServerError)
 		return
 	}
 	defer resp.Body.Close()
@@ -152,7 +167,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Failed to read response: %v", err)
-		http.Error(w, "Failed to read response", http.StatusInternalServerError)
+		http.Error(w, `{"status": "server error"}`, http.StatusInternalServerError)
 		return
 	}
 
@@ -169,6 +184,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+
 // Login godoc
 // @Summary Login a user
 // @Description Authenticate a user and return a JWT token
@@ -176,9 +192,9 @@ func Register(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Produce json
 // @Param user body UserLogin true "User details"
-// @Success 200 {object} map[string]interface{} "Login successful with user details"
-// @Failure 401 {object} map[string]string{"status": "invalid credentials"}
-// @Failure 500 {object} map[string]string{"status": "server error"}
+// @Success 200 {object} LoginSuccessResponse "Login successful with user details and token"
+// @Failure 401 {object} FailResponse "Login failed"
+// @Failure 500 {object} FailResponse "Server error"
 // @Router /login [post]
 func Login(w http.ResponseWriter, r *http.Request) {
 	resp, err := http.Post("http://54.145.134.156:8085/auth/login", "application/json", r.Body)
@@ -216,7 +232,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Produce json
 // @Param payment body PaymentRequest true "Payment Request"
-// @Success 202 {object} map[string]string{"status_code":"","merchant_reference":"b4d2bec4-13cc-4967-b857-dd0a54753d51","transaction_type":"","success":true,"message":"Payment request sent successfully","status":200,"checkout_request_id":"b4d2bec4-13cc-4967-b857-dd0a54753d51","checkout_url":"https://pay.pesapal.com/iframe/PesapalIframe3/Index?OrderTrackingId=b4d2bec4-13cc-4967-b857-dd0a54753d51","transaction_reference":"b4d2bec4-13cc-4967-b857-dd0a54753d51","channel":"card","payment_gateway":"paystack"}
+// @Success 202 {object} string "Success"
 // @Failure 400 {string} string "Bad Request"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /payments/initiate [post]

@@ -48,21 +48,21 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Login successful with user details and token",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/main.LoginSuccessResponse"
                         }
                     },
                     "401": {
-                        "description": "Invalid Credentials",
+                        "description": "Login failed",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/main.FailResponse"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Server error",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/main.FailResponse"
                         }
                     }
                 }
@@ -94,7 +94,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "202": {
-                        "description": "Accepted",
+                        "description": "Success",
                         "schema": {
                             "type": "string"
                         }
@@ -221,15 +221,21 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created",
+                        "description": "Registration successful",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/main.SuccessResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Registration failed",
+                        "schema": {
+                            "$ref": "#/definitions/main.FailResponse"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Server error",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/main.FailResponse"
                         }
                     }
                 }
@@ -237,6 +243,28 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "main.FailResponse": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.LoginSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/main.User"
+                }
+            }
+        },
         "main.MobilePaymentRequest": {
             "type": "object",
             "properties": {
@@ -291,6 +319,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.SuccessResponse": {
+            "type": "object",
+            "properties": {
+                "status": {
                     "type": "string"
                 }
             }

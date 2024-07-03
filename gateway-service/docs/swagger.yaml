@@ -1,5 +1,19 @@
 basePath: /
 definitions:
+  main.FailResponse:
+    properties:
+      status:
+        type: string
+    type: object
+  main.LoginSuccessResponse:
+    properties:
+      status:
+        type: string
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/main.User'
+    type: object
   main.MobilePaymentRequest:
     properties:
       account_id:
@@ -36,6 +50,11 @@ definitions:
       reason:
         type: string
       username:
+        type: string
+    type: object
+  main.SuccessResponse:
+    properties:
+      status:
         type: string
     type: object
   main.User:
@@ -87,17 +106,17 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Login successful with user details and token
           schema:
-            type: string
+            $ref: '#/definitions/main.LoginSuccessResponse'
         "401":
-          description: Invalid Credentials
+          description: Login failed
           schema:
-            type: string
+            $ref: '#/definitions/main.FailResponse'
         "500":
-          description: Internal Server Error
+          description: Server error
           schema:
-            type: string
+            $ref: '#/definitions/main.FailResponse'
       summary: Login a user
       tags:
       - auth
@@ -117,7 +136,7 @@ paths:
       - application/json
       responses:
         "202":
-          description: Accepted
+          description: Success
           schema:
             type: string
         "400":
@@ -200,13 +219,17 @@ paths:
       - application/json
       responses:
         "201":
-          description: Created
+          description: Registration successful
           schema:
-            type: string
+            $ref: '#/definitions/main.SuccessResponse'
+        "401":
+          description: Registration failed
+          schema:
+            $ref: '#/definitions/main.FailResponse'
         "500":
-          description: Internal Server Error
+          description: Server error
           schema:
-            type: string
+            $ref: '#/definitions/main.FailResponse'
       summary: Register a new user
       tags:
       - auth
