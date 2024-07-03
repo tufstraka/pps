@@ -53,7 +53,7 @@ definitions:
   main.SuccessResponse:
     properties:
       user:
-        type: string
+        $ref: '#/definitions/main.User'
     type: object
   main.User:
     properties:

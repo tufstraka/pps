@@ -136,7 +136,7 @@ type LoginSuccessResponse struct {
 }
 
 type SuccessResponse struct {
-	User string `json:"user"`
+	User User `json:"user"`
 }
 
 type FailResponse struct {

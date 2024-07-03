@@ -324,7 +324,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "user": {
-                    "type": "string"
+                    "$ref": "#/definitions/main.User"
                 }
             }
         },
