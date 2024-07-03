@@ -156,6 +156,7 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
 	_, err = db.Exec("INSERT INTO payments (amount, currency, method, status, user_id) VALUES ($1, $2, $3, $4, $5)",
 		payment.Amount, "KES", payment.PaymentMethod, "PENDING", id)
 	if err != nil {
+		log.Printf("Error inserting payment into db: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
