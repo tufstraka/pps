@@ -56,6 +56,11 @@ func main() {
 	http.ListenAndServe(":8082", r)
 }
 
+type PaymentResponse struct {
+	Status    string `json:"status"`
+	PaymentID int    `json:"payment_id"`
+}
+
 type PaymentRequest struct {
 	Amount        float64 `json:"amount"`
 	Email         string  `json:"email"`
@@ -77,7 +82,6 @@ type MobilePaymentRequest struct {
 	Channel       string  `json:"channel"`
 	PaymentMethod string  `json:"payment_method"`
 }
-
 // InitiatePayment godoc
 // @Summary Initiate a payment
 // @Description Initiate a payment to a user
@@ -85,7 +89,7 @@ type MobilePaymentRequest struct {
 // @Accept json
 // @Produce json
 // @Param payment body PaymentRequest true "Payment Request"
-// @Success 202 {string} string "Accepted"
+// @Success 202 {object} PaymentResponse "Accepted"
 // @Failure 400 {string} string "Bad Request"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /payments/initiate [post]
@@ -97,36 +101,31 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var id int
-	err = db.QueryRow("SELECT id FROM users WHERE username=$1", payment.Username).Scan(&id)
+	// Verify user existence and get user ID
+	var userID int
+	err = db.QueryRow("SELECT id FROM users WHERE username=$1", payment.Username).Scan(&userID)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "User not found", http.StatusNotFound)
 		return
 	}
 
-	username := os.Getenv("PAYD_USERNAME")
-	password := os.Getenv("PAYD_PASSWORD")
-	auth := username + ":" + password
-	authEncoded := base64.StdEncoding.EncodeToString([]byte(auth))
+	// Prepare JSON body for Payd API request
 	jsonBody, err := json.Marshal(payment)
 	if err != nil {
 		http.Error(w, "Internal Server Error: failed to marshal JSON", http.StatusInternalServerError)
 		return
 	}
+
+	// Make request to Payd API
 	paydAPIURL := "https://api.mypayd.app/api/v1/payments"
-
-	log.Println("Sending payment request to Payd API:")
-	log.Printf("Body: %s", jsonBody)
-	log.Printf("Authorization: Basic %s", authEncoded)
-
 	req, err := http.NewRequest("POST", paydAPIURL, bytes.NewBuffer(jsonBody))
 	if err != nil {
 		http.Error(w, "Failed to create request", http.StatusInternalServerError)
 		return
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Basic "+authEncoded)
+	req.SetBasicAuth(os.Getenv("PAYD_USERNAME"), os.Getenv("PAYD_PASSWORD"))
 
 	client := &http.Client{Timeout: 30 * time.Second}
 	resp, err := client.Do(req)
@@ -147,22 +146,31 @@ func InitiatePayment(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Response Status Code: %d", resp.StatusCode)
 	log.Printf("Response Body: %s", respBody)
 
+	// Check Payd API response status
 	if resp.StatusCode != http.StatusCreated {
 		log.Printf("Failed to initiate payment. Status code: %d", resp.StatusCode)
 		http.Error(w, string(respBody), http.StatusBadRequest)
 		return
 	}
 
-	_, err = db.Exec("INSERT INTO payments (amount, currency, method, status, user_id) VALUES ($1, $2, $3, $4, $5)",
-		payment.Amount, "KES", payment.PaymentMethod, "PENDING", id)
+	// Insert payment details into database and get generated ID
+	var paymentID int
+	err = db.QueryRow("INSERT INTO payments (amount, currency, method, status, user_id) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+		payment.Amount, "KES", payment.PaymentMethod, "PENDING", userID).Scan(&paymentID)
 	if err != nil {
 		log.Printf("Error inserting payment into db: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
+	response := PaymentResponse{
+		Status:    "Accepted",
+		PaymentID: paymentID,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusAccepted)
-	w.Write(respBody)
+	json.NewEncoder(w).Encode(response)
 }
 
 // SendToMobile godoc

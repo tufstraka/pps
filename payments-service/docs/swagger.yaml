@@ -38,6 +38,13 @@ definitions:
       username:
         type: string
     type: object
+  main.PaymentResponse:
+    properties:
+      payment_id:
+        type: integer
+      status:
+        type: string
+    type: object
 host: localhost:8082
 info:
   contact:
@@ -68,7 +75,7 @@ paths:
         "202":
           description: Accepted
           schema:
-            type: string
+            $ref: '#/definitions/main.PaymentResponse'
         "400":
           description: Bad Request
           schema:

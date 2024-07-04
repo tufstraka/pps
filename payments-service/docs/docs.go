@@ -50,7 +50,7 @@ const docTemplate = `{
                     "202": {
                         "description": "Accepted",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/main.PaymentResponse"
                         }
                     },
                     "400": {
@@ -214,6 +214,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.PaymentResponse": {
+            "type": "object",
+            "properties": {
+                "payment_id": {
+                    "type": "integer"
+                },
+                "status": {
                     "type": "string"
                 }
             }
