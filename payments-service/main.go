@@ -82,6 +82,7 @@ type MobilePaymentRequest struct {
 	Channel       string  `json:"channel"`
 	PaymentMethod string  `json:"payment_method"`
 }
+
 // InitiatePayment godoc
 // @Summary Initiate a payment
 // @Description Initiate a payment to a user
