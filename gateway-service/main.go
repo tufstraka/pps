@@ -185,7 +185,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	switch resp.StatusCode {
-	case http.StatusOK:
+	case http.StatusCreated:
 		w.WriteHeader(http.StatusOK)
 		w.Write(body)
 	case http.StatusUnauthorized:
