@@ -84,7 +84,7 @@ func loggingMiddleware(next http.Handler) http.Handler {
 				log.Printf("Failed to read request body: %v", err)
 			} else {
 				log.Printf("Body: %s", body)
-				r.Body = io.NopCloser(bytes.NewBuffer(body)) // Reset the request body
+				r.Body = io.NopCloser(bytes.NewBuffer(body))
 			}
 		}
 
@@ -134,7 +134,7 @@ type MobilePaymentRequest struct {
 	PaymentMethod string  `json:"payment_method"`
 }
 
-// @ignore
+// @JsonIgnore
 type LoginSuccessResponse struct {
 	Status string `json:"status"`
 	Token  string `json:"token"`
@@ -148,6 +148,12 @@ type SuccessResponse struct {
 // @ignore
 type FailResponse struct {
 	Status string `json:"status"`
+}
+
+// @ignore
+type PaymentResponse struct {
+	Status    string `json:"status"`
+	PaymentID int    `json:"payment_id"`
 }
 
 // Register godoc
@@ -191,7 +197,6 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 // Login godoc
 // @Summary Login a user
 // @Description Authenticate a user and return a JWT token
@@ -204,50 +209,49 @@ func Register(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} FailResponse "Server error"
 // @Router /login [post]
 func Login(w http.ResponseWriter, r *http.Request) {
-    resp, err := http.Post("http://54.145.134.156:8085/auth/login", "application/json", r.Body)
-    if err != nil {
-        log.Printf("Failed to login user: %v", err)
-        http.Error(w, `{"status": "server error"}`, http.StatusInternalServerError)
-        return
-    }
-    defer resp.Body.Close()
+	resp, err := http.Post("http://54.145.134.156:8085/auth/login", "application/json", r.Body)
+	if err != nil {
+		log.Printf("Failed to login user: %v", err)
+		http.Error(w, `{"status": "server error"}`, http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
 
-    var response struct {
-        Status string `json:"status"`
-        Token  string `json:"token,omitempty"`
-    }
+	var response struct {
+		Status string `json:"status"`
+		Token  string `json:"token,omitempty"`
+	}
 
-    body, err := io.ReadAll(resp.Body)
-    if err != nil {
-        log.Printf("Failed to read response: %v", err)
-        http.Error(w, `{"status": "server error"}`, http.StatusInternalServerError)
-        return
-    }
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Printf("Failed to read response: %v", err)
+		http.Error(w, `{"status": "server error"}`, http.StatusInternalServerError)
+		return
+	}
 
-    w.Header().Set("Content-Type", "application/json")
-    switch resp.StatusCode {
-    case http.StatusOK:
-        json.Unmarshal(body, &response)
-        w.WriteHeader(http.StatusOK)
-        json.NewEncoder(w).Encode(response)
-    case http.StatusUnauthorized:
-        w.WriteHeader(http.StatusUnauthorized)
-        json.NewEncoder(w).Encode(FailResponse{Status: "invalid credentials"})
-    default:
-        w.WriteHeader(http.StatusInternalServerError)
-        json.NewEncoder(w).Encode(FailResponse{Status: "server error"})
-    }
+	w.Header().Set("Content-Type", "application/json")
+	switch resp.StatusCode {
+	case http.StatusOK:
+		json.Unmarshal(body, &response)
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(response)
+	case http.StatusUnauthorized:
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(FailResponse{Status: "invalid credentials"})
+	default:
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(FailResponse{Status: "server error"})
+	}
 }
-
 
 // InitiatePayment godoc
 // @Summary Initiate a payment
-// @Description Initiate a payment for a user
+// @Description Initiate a payment to a user
 // @Tags payments
 // @Accept json
 // @Produce json
 // @Param payment body PaymentRequest true "Payment Request"
-// @Success 202 {object} string "Success"
+// @Success 202 {object} PaymentResponse "Accepted"
 // @Failure 400 {string} string "Bad Request"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /payments/initiate [post]
