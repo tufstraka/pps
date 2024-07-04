@@ -70,7 +70,7 @@ const docTemplate = `{
         },
         "/payments/initiate": {
             "post": {
-                "description": "Initiate a payment for a user",
+                "description": "Initiate a payment to a user",
                 "consumes": [
                     "application/json"
                 ],
@@ -94,9 +94,9 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "202": {
-                        "description": "Success",
+                        "description": "Accepted",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/main.PaymentResponse"
                         }
                     },
                     "400": {
@@ -316,6 +316,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.PaymentResponse": {
+            "type": "object",
+            "properties": {
+                "payment_id": {
+                    "type": "integer"
+                },
+                "status": {
                     "type": "string"
                 }
             }

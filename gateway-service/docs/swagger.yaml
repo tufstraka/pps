@@ -50,6 +50,13 @@ definitions:
       username:
         type: string
     type: object
+  main.PaymentResponse:
+    properties:
+      payment_id:
+        type: integer
+      status:
+        type: string
+    type: object
   main.SuccessResponse:
     properties:
       user:
@@ -122,7 +129,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Initiate a payment for a user
+      description: Initiate a payment to a user
       parameters:
       - description: Payment Request
         in: body
@@ -134,9 +141,9 @@ paths:
       - application/json
       responses:
         "202":
-          description: Success
+          description: Accepted
           schema:
-            type: string
+            $ref: '#/definitions/main.PaymentResponse'
         "400":
           description: Bad Request
           schema:
