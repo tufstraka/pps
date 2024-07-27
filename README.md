@@ -118,10 +118,6 @@ sudo docker compose up
 
 Everything else will be done automatically and you can find the gateway exposed on port 8083
 
-### Deployed endpoints
-
-[Gateway](http://54.145.134.156:8083/swagger/index.html)
-
 ### Database Schema
 ![Database Schema](./PPS.png)
 
